@@ -93,4 +93,4 @@ Otherwise you are welcome to open an Issue in our [issue tracker](https://github
 
 ## License
 
-Relewise.Integrations.Umbraco is under the [MIT licensed](./LICENSE)
+Relewise.Client.Extensions is under the [MIT licensed](./LICENSE)
