@@ -10,7 +10,7 @@ Run this command from the NuGet Package Manager Console to install the NuGet pac
 
 ## Features
 
-### Wiring up the SDK Client
+### Dependcency Injection / Wiring up the SDK Client
 
 We provide a lot of ways to easily add the clients you need. The default way to do that is using the following code:
 ```csharp
@@ -21,8 +21,9 @@ services.AddRelewise(options =>
          options.Timeout = TimeSpan.FromSeconds(3);
      });
 ```
+This will expose a ITracker, IRecommender and ISearcher for the dataset and apikey specificed above with a request timeout of 3 seconds.
 
-You should read the Dataset Id and API key from a configuration-file. Which is also posible to do easily:
+We recommend that the Dataset Id and API key is stored in a configuration-file. We provide a default way of reading from the appsettings.json:
 ```csharp
 IConfiguration configuration = new ConfigurationBuilder()
         .SetBasePath(Directory.GetCurrentDirectory())
@@ -38,7 +39,7 @@ The configuration offers a lot of nifty features, should as
 - Set specific dataset, apikey or timeout for either the tracker, the recommender or the searcher.
 - Named clients to allow different configuration for integrations etc or to use for a multi site-setup.
 
-Here is full example of all the configurations you can do in either the configuration or via the fluent API:
+Here is a full example of all the configuration settings we provide via the appsettings or via the fluent API:
 ```json
   "Relewise": {
     "DatasetId": "6D9361AA-A23D-4BF2-A818-5ABA792E2102",
