@@ -24,8 +24,14 @@ services.AddRelewise(options =>
 
 You should read the Dataset Id and API key from a configuration-file. Which is also posible to do easily:
 ```csharp
+var configuration = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json")
+        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", true)
+        .Build();
+        
 services
-    .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()));
+    .AddRelewise(options => options.ReadFromConfiguration(configuration));
 ```
 
 The configuration offers a lot of nifty features, should as 
