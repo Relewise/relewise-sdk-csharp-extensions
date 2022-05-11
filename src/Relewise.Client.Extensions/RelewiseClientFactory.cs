@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Relewise.Client.Extensions.DependencyInjection;
 using Relewise.Client.Extensions.Infrastructure.Extensions;
 using Relewise.Client.Search;
 
-namespace Relewise.Client.Extensions.DependencyInjection;
+namespace Relewise.Client.Extensions;
 
 internal class RelewiseClientFactory : IRelewiseClientFactory
 {

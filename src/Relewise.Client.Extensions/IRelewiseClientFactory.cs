@@ -1,4 +1,4 @@
-﻿namespace Relewise.Client.Extensions.DependencyInjection;
+﻿namespace Relewise.Client.Extensions;
 
 public interface IRelewiseClientFactory
 {
