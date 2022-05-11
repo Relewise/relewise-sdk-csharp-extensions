@@ -12,7 +12,7 @@ Run this command from the NuGet Package Manager Console to install the NuGet pac
 
 ### Wiring up the SDK Client
 
-We provide a lot of ways to easily add the clients you need. The standard way to do that is using the following code:
+We provide a lot of ways to easily add the clients you need. The default way to do that is using the following code:
 ```csharp
 services.AddRelewise(options =>
      {
@@ -29,8 +29,53 @@ services
 ```
 
 The configuration offers a lot of nifty features, should as 
-- specific dataset, apikey or timeout of either the tracker, the recommender or the searcher.
-- Named clients to allow different configuration for integrations or a multi site-setup.
+- Set specific dataset, apikey or timeout for either the tracker, the recommender or the searcher.
+- Named clients to allow different configuration for integrations etc or to use for a multi site-setup.
+
+Here is full example of all the configurations you can do in either the configuration or via the fluent API:
+```json
+  "Relewise": {
+    "DatasetId": "6D9361AA-A23D-4BF2-A818-5ABA792E2102",
+    "ApiKey": "r4FqfMqtiZjJmoN",
+    "Timeout": "00:00:03",
+    "Tracker": {
+      "Timeout": "00:00:10"
+    },
+    "Recommender": {
+      "Timeout": "00:00:05"
+    },
+    "Searcher": {
+      "Timeout": "00:00:10"
+    },
+    "Named": {
+      "Integration": {
+        "Tracker": {
+          "Timeout": "00:01:00"
+        }
+      },
+      "ContentSite": {
+        "DatasetId": "8DF23DAF-6C96-47DB-BE34-84629359D3B8",
+        "ApiKey": "61ce444b6e7c4f",
+        "Timeout": "00:00:10",
+        "Tracker": {
+          "Timeout": "00:00:10"
+        },
+        "Recommender": {
+          "Timeout": "00:00:05"
+        },
+        "Searcher": {
+          "Timeout": "00:00:10"
+        }
+      }
+    }
+  }
+```
+
+When using named clients, you can use the `IRelewiseClientFactory` to get a ITracker, IRecommender or ISearcher:
+```csharp
+IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
+ITracker tracker = factory.GetClient<ITracker>("Integration");
+```
 
 ## Contributing
 
