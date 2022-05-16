@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Relewise.Client.Extensions.Infrastructure.Extensions;
 
-namespace Relewise.Client.Extensions.DependencyInjection;
+namespace Relewise.Client.Extensions.DependencyInjection; // NOTE: Jeg foreslår du flytter denne fil ud i roden af projektet
 
 public class DefaultOptions
 {
@@ -25,11 +25,16 @@ public class RelewiseOptions : ClientOptions
 
     public void ReadFromConfiguration(IConfiguration configuration, string sectionName = "Relewise")
     {
-        var relewiseSection = configuration.GetSection(sectionName);
+        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+        if (string.IsNullOrWhiteSpace(sectionName)) throw new ArgumentException(@"Value cannot be null or empty", nameof(sectionName));
+
+        IConfigurationSection? relewiseSection = configuration.GetSection(sectionName);
+
         if (relewiseSection == null)
             throw new ArgumentException("The specified section was not found", nameof(sectionName));
 
         var readOptions = relewiseSection.Get<RelewiseJsonConfiguration>();
+
         if (readOptions == null)
             throw new InvalidOperationException("Could not read options from configuration file");
 

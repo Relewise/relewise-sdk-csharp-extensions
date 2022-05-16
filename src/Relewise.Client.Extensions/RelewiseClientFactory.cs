@@ -19,10 +19,11 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         _provider = provider;
 
         var clients = new Dictionary<string, IClient>();
+
         foreach ((string name, ClientOptions clientOptions) in options.Named.Clients.AsTuples())
         {
             clients.Add(GenerateClientLookupKey<ISearcher>(name), new Searcher(
-                clientOptions.DatasetId ?? options.DatasetId ?? Guid.Empty,
+                clientOptions.DatasetId ?? options.DatasetId ?? Guid.Empty, // NOTE: Vi bør nok fange dét scenarie, hvor vi ender med en 'Guid.Empty' -> og smide en fejl
                 clientOptions.ApiKey ?? options.ApiKey,
                 options.GetTimeout(() => clientOptions.Searcher.Timeout ?? clientOptions.Timeout)));
 
@@ -43,6 +44,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
     public T GetClient<T>() where T : IClient
     {
         T? client = _provider.GetService<T>();
+
         if (client == null)
             throw new ArgumentException("No client was registered during startup");
 
@@ -51,9 +53,8 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 
     public T GetClient<T>(string name) where T : IClient
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("value can not be null or empty", nameof(name));
-
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException(@"Value cannot be null or empty", nameof(name));
+        
         if (!_options.Named.Clients.ContainsKey(name))
             throw new ArgumentException($"No clients with name '{name}' was registered during startup");
 

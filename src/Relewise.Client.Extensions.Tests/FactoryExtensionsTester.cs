@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Relewise.Client.Extensions.DependencyInjection;

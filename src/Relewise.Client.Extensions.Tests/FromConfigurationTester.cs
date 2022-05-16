@@ -32,6 +32,7 @@ namespace Relewise.Client.Extensions.Tests
         public void ReadFromConfiguration_WithNamedClients()
         {
             // TODO Create test
+            // NOTE: Skal der gøres noget her?
             var serviceCollection = new ServiceCollection()
                 .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()));
 

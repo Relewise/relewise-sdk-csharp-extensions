@@ -25,6 +25,8 @@ public static class ServiceCollectionExtensions
         else if (config.Named.Clients.Count == 0)
         {
             // TODO perform better validation
+            // NOTE: Noget der skal gøres nu?
+
             throw new ArgumentException("The provided options was not in a valid state, either provide a global dataset and ApiKey or provide at least 1 valid named client");
         }
 
