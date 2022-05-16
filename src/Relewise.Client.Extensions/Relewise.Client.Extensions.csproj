@@ -8,9 +8,9 @@
 		<AssemblyName>Relewise.Client.Extensions</AssemblyName>
 		<RootNamespace>Relewise.Client.Extensions</RootNamespace>
 		<Title>Relewise Client Extensions</Title>
-		<Description>An extension library for working more effective with the Relewise SDK Client</Description>
+		<Description>An extension library that helps you working more efficient with the Relewise Client SDK (see 'Relewise.Client'), including configuration options, multiple named clients and more to come in the future. Relewise is a next generation personalization SaaS-platform, which offers functionality within product- and content recommendations and personalized search.</Description>
 		<PackageIcon>logo.png</PackageIcon>
-		<PackageTags>Relewise</PackageTags>
+		<PackageTags>Relewise;Recommendations;Search;Personalization;Recommender</PackageTags>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<License>http://opensource.org/licenses/MIT</License>
 		<PackageProjectUrl>https://github.com/Relewise/relewise-sdk-csharp-extensions</PackageProjectUrl>
