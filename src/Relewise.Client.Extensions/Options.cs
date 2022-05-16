@@ -5,7 +5,7 @@ using Relewise.Client.Extensions.Infrastructure.Extensions;
 
 namespace Relewise.Client.Extensions;
 
-public class DefaultOptions
+public class RelewiseClientOptions
 {
     public Guid? DatasetId { get; set; }
     public string? ApiKey { get; set; }
@@ -19,11 +19,11 @@ public class DefaultOptions
     }
 }
 
-public class ClientOptions : DefaultOptions
+public class RelewiseClientsOptions : RelewiseClientOptions
 {
-    public DefaultOptions Tracker { get; } = new();
-    public DefaultOptions Recommender { get; } = new();
-    public DefaultOptions Searcher { get; } = new();
+    public RelewiseClientOptions Tracker { get; } = new();
+    public RelewiseClientOptions Recommender { get; } = new();
+    public RelewiseClientOptions Searcher { get; } = new();
 
     internal bool IsClientsValid()
     {
@@ -37,7 +37,7 @@ public class ClientOptions : DefaultOptions
     }
 }
 
-public class RelewiseOptions : ClientOptions
+public class RelewiseOptions : RelewiseClientsOptions
 {
     public NamedClients Named { get; } = new();
 
@@ -66,16 +66,16 @@ public class RelewiseOptions : ClientOptions
 
     public class NamedClients
     {
-        internal Dictionary<string, ClientOptions> Clients { get; } = new();
+        internal Dictionary<string, RelewiseClientsOptions> Clients { get; } = new();
 
-        public void Add(string name, Action<ClientOptions> options)
+        public void Add(string name, Action<RelewiseClientsOptions> options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             if (Clients.ContainsKey(name))
                 throw new ArgumentException("A client with that name was already registered", nameof(name));
 
-            var clientOptions = new ClientOptions();
+            var clientOptions = new RelewiseClientsOptions();
             options.Invoke(clientOptions);
 
             Clients.Add(name, clientOptions);
@@ -88,7 +88,7 @@ public class RelewiseOptions : ClientOptions
         public SharedRelewiseJsonConfiguration? Recommender { get; }
         public SharedRelewiseJsonConfiguration? Searcher { get; }
 
-        public Dictionary<string, ClientOptions>? Named { get; set; }
+        public Dictionary<string, RelewiseClientsOptions>? Named { get; set; }
 
         internal void Map(RelewiseOptions options)
         {
@@ -110,7 +110,7 @@ public class RelewiseOptions : ClientOptions
 
             if (Named is { Count: > 0 })
             {
-                foreach ((string name, ClientOptions clientOptions) in Named.AsTuples())
+                foreach ((string name, RelewiseClientsOptions clientOptions) in Named.AsTuples())
                 {
                     options.Named.Add(name, opt =>
                     {

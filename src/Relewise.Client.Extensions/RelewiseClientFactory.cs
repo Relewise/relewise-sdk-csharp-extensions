@@ -18,7 +18,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 
         var clients = new Dictionary<string, IClient>();
 
-        foreach ((string name, ClientOptions clientOptions) in options.Named.Clients.AsTuples())
+        foreach ((string name, RelewiseClientsOptions clientOptions) in options.Named.Clients.AsTuples())
         {
             Guid dataSetId = clientOptions.DatasetId ?? options.DatasetId ?? Guid.Empty;
             if (dataSetId == Guid.Empty)
