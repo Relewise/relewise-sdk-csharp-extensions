@@ -1,4 +1,4 @@
-# Relewise.Client.Extensions
+# Relewise.Client.Extensions &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![NuGet version](https://img.shields.io/nuget/v/Relewise.Client.Extensions)](https://www.nuget.org/packages/Relewise.Client.Extensions) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://https://github.com/Relewise/relewise-sdk-csharp-extensions/pulls)
 
 ### Relewise.Client.Extensions
 
