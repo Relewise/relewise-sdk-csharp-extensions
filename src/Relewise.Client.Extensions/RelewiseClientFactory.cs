@@ -10,10 +10,11 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 {
     private readonly IReadOnlyDictionary<string, IClient> _clients;
     private readonly IServiceProvider _provider;
+    private readonly RelewiseOptions _options;
 
     public RelewiseClientFactory(RelewiseOptions options, IServiceProvider provider)
     {
-        Options = options;
+        _options = options;
         _provider = provider;
 
         var clients = new Dictionary<string, IClient>();
@@ -57,7 +58,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException(@"Value cannot be null or empty", nameof(name));
 
-        if (!Options.Named.Clients.ContainsKey(name))
+        if (!_options.Named.Clients.ContainsKey(name))
             throw new ArgumentException($"No clients with name '{name}' was registered during startup");
 
         if (!_clients.TryGetValue(GenerateClientLookupKey<T>(name), out IClient client))
@@ -70,8 +71,6 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 
         return (T)client!;
     }
-
-    public RelewiseOptions Options { get; }
 
     private static string GenerateClientLookupKey<T>(string name) => $"{name}_{typeof(T).Name}";
 }
