@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Relewise.Client.Search;
 
@@ -6,35 +7,27 @@ namespace Relewise.Client.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptions> options)
+    public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptions> configure)
     {
-        if (options == null) throw new ArgumentNullException(nameof(options));
+        if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-        var config = new RelewiseOptions();
-        options.Invoke(config);
+        var options = new RelewiseOptions();
+        configure.Invoke(options);
 
-        services.AddSingleton(config);
+        services.AddSingleton(options);
         services.AddSingleton<IRelewiseClientFactory, RelewiseClientFactory>();
 
-        if (!string.IsNullOrWhiteSpace(config.ApiKey) && config.DatasetId.HasValue)
+        if (options.IsConfigurationValid())
         {
-            services.AddSingleton<ITracker>(new Tracker(config.DatasetId.GetValueOrDefault(), config.ApiKey, GetTimeout(config, () => config.Tracker.Timeout)));
-            services.AddSingleton<IRecommender>(new Recommender(config.DatasetId.GetValueOrDefault(), config.ApiKey, GetTimeout(config, () => config.Recommender.Timeout)));
-            services.AddSingleton<ISearcher>(new Searcher(config.DatasetId.GetValueOrDefault(), config.ApiKey, GetTimeout(config, () => config.Searcher.Timeout)));
+            services.AddSingleton<ITracker>(new Tracker(options.DatasetId.GetValueOrDefault(), options.ApiKey, options.GetTimeout(() => options.Tracker.Timeout)));
+            services.AddSingleton<IRecommender>(new Recommender(options.DatasetId.GetValueOrDefault(), options.ApiKey, options.GetTimeout(() => options.Recommender.Timeout)));
+            services.AddSingleton<ISearcher>(new Searcher(options.DatasetId.GetValueOrDefault(), options.ApiKey, options.GetTimeout(() => options.Searcher.Timeout)));
         }
-        else if (config.Named.Clients.Count == 0)
+        else if (options.Named.Clients.Count == 0 || options.Named.Clients.Any(x => !x.Value.IsClientsValid()))
         {
-            // TODO perform better validation
-            // NOTE: Noget der skal gøres nu?
-
             throw new ArgumentException("The provided options was not in a valid state, either provide a global dataset and ApiKey or provide at least 1 valid named client");
         }
 
         return services;
-    }
-
-    private static TimeSpan GetTimeout(RelewiseOptions options, Func<TimeSpan?> fromSpecificClient)
-    {
-        return fromSpecificClient() ?? options.Timeout ?? TimeSpan.FromSeconds(5);
     }
 }

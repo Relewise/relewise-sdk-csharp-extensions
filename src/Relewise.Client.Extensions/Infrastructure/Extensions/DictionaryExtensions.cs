@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Relewise.Client.Extensions.DependencyInjection;
 
 namespace Relewise.Client.Extensions.Infrastructure.Extensions;
 

@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Relewise.Client.Extensions.Infrastructure.Extensions;
 
-namespace Relewise.Client.Extensions.DependencyInjection; // NOTE: Jeg foreslår du flytter denne fil ud i roden af projektet
+namespace Relewise.Client.Extensions;
 
 public class DefaultOptions
 {
     public Guid? DatasetId { get; set; }
     public string? ApiKey { get; set; }
     public TimeSpan? Timeout { get; set; }
+
+    internal bool IsConfigurationValid()
+    {
+        return !string.IsNullOrWhiteSpace(ApiKey) &&
+               DatasetId.HasValue &&
+               DatasetId.Value != Guid.Empty;
+    }
 }
 
 public class ClientOptions : DefaultOptions
@@ -17,6 +24,17 @@ public class ClientOptions : DefaultOptions
     public DefaultOptions Tracker { get; } = new();
     public DefaultOptions Recommender { get; } = new();
     public DefaultOptions Searcher { get; } = new();
+
+    internal bool IsClientsValid()
+    {
+        if (IsConfigurationValid())
+            return true;
+
+        if (Tracker.IsConfigurationValid() && Recommender.IsConfigurationValid() && Searcher.IsConfigurationValid())
+            return true;
+
+        return false;
+    }
 }
 
 public class RelewiseOptions : ClientOptions
@@ -63,52 +81,52 @@ public class RelewiseOptions : ClientOptions
             Clients.Add(name, clientOptions);
         }
     }
-}
 
-internal class RelewiseJsonConfiguration : SharedRelewiseJsonConfiguration
-{
-    public SharedRelewiseJsonConfiguration? Tracker { get; }
-    public SharedRelewiseJsonConfiguration? Recommender { get; }
-    public SharedRelewiseJsonConfiguration? Searcher { get; }
-
-    public Dictionary<string, ClientOptions>? Clients { get; set; }
-
-    internal void Map(RelewiseOptions options)
+    internal class RelewiseJsonConfiguration : SharedRelewiseJsonConfiguration
     {
-        options.ApiKey = ApiKey;
-        options.DatasetId = DatasetId;
-        options.Timeout = Timeout;
+        public SharedRelewiseJsonConfiguration? Tracker { get; }
+        public SharedRelewiseJsonConfiguration? Recommender { get; }
+        public SharedRelewiseJsonConfiguration? Searcher { get; }
 
-        options.Tracker.DatasetId = Tracker?.DatasetId;
-        options.Tracker.ApiKey = Tracker?.ApiKey;
-        options.Tracker.Timeout = Tracker?.Timeout;
+        public Dictionary<string, ClientOptions>? Named { get; set; }
 
-        options.Searcher.DatasetId = Searcher?.DatasetId;
-        options.Searcher.ApiKey = Searcher?.ApiKey;
-        options.Searcher.Timeout = Searcher?.Timeout;
-
-        options.Recommender.DatasetId = Recommender?.DatasetId;
-        options.Recommender.ApiKey = Recommender?.ApiKey;
-        options.Recommender.Timeout = Recommender?.Timeout;
-
-        if (Clients is { Count: > 0 })
+        internal void Map(RelewiseOptions options)
         {
-            foreach ((string name, ClientOptions clientOptions) in Clients.AsTuples())
+            options.ApiKey = ApiKey;
+            options.DatasetId = DatasetId;
+            options.Timeout = Timeout;
+
+            options.Tracker.DatasetId = Tracker?.DatasetId;
+            options.Tracker.ApiKey = Tracker?.ApiKey;
+            options.Tracker.Timeout = Tracker?.Timeout;
+
+            options.Searcher.DatasetId = Searcher?.DatasetId;
+            options.Searcher.ApiKey = Searcher?.ApiKey;
+            options.Searcher.Timeout = Searcher?.Timeout;
+
+            options.Recommender.DatasetId = Recommender?.DatasetId;
+            options.Recommender.ApiKey = Recommender?.ApiKey;
+            options.Recommender.Timeout = Recommender?.Timeout;
+
+            if (Named is { Count: > 0 })
             {
-                options.Named.Add(name, opt =>
+                foreach ((string name, ClientOptions clientOptions) in Named.AsTuples())
                 {
-                    opt.ApiKey = clientOptions.ApiKey;
-                    opt.DatasetId = clientOptions.DatasetId;
-                    opt.Timeout = clientOptions.Timeout;
-                });
+                    options.Named.Add(name, opt =>
+                    {
+                        opt.ApiKey = clientOptions.ApiKey;
+                        opt.DatasetId = clientOptions.DatasetId;
+                        opt.Timeout = clientOptions.Timeout;
+                    });
+                }
             }
         }
     }
-}
 
-internal class SharedRelewiseJsonConfiguration
-{
-    public Guid? DatasetId { get; set; }
-    public string? ApiKey { get; set; }
-    public TimeSpan? Timeout { get; set; }
+    internal class SharedRelewiseJsonConfiguration
+    {
+        public Guid? DatasetId { get; set; }
+        public string? ApiKey { get; set; }
+        public TimeSpan? Timeout { get; set; }
+    }
 }
