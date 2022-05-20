@@ -8,15 +8,20 @@ namespace Relewise.Client.Extensions;
 
 internal class RelewiseClientFactory : IRelewiseClientFactory
 {
+    private readonly IServiceProvider _provider;
     private readonly Dictionary<string, IClient> _clients;
     private readonly Dictionary<string, RelewiseClientOptions> _options;
-    private readonly IServiceProvider _provider;
 
-    public RelewiseClientFactory(RelewiseOptionsBuilder options, IServiceProvider provider)
+    public RelewiseClientFactory(IServiceProvider provider)
     {
+        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         _clients = new Dictionary<string, IClient>();
         _options = new Dictionary<string, RelewiseClientOptions>();
-        _provider = provider;
+
+        var options = new RelewiseOptionsBuilder();
+
+        foreach (Configure configure in provider.GetServices<Configure>())
+            configure(options, provider);
 
         RelewiseClientOptions? globalOptions;
 
@@ -144,4 +149,6 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
     }
 
     private static string GenerateClientLookupKey<T>(string? name = null) => $"{name}_{typeof(T).Name}";
+
+    public delegate void Configure(RelewiseOptionsBuilder builder, IServiceProvider services);
 }

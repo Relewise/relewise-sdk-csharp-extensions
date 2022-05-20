@@ -14,7 +14,7 @@ namespace Relewise.Client.Extensions.Tests
         public void ReadFromConfiguration_Default()
         {
             var serviceCollection = new ServiceCollection()
-                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()), reset: true);
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()));
 
             FromConfigAssertion(serviceCollection);
         }
@@ -23,7 +23,7 @@ namespace Relewise.Client.Extensions.Tests
         public void ReadFromConfiguration_SpecificSection()
         {
             var serviceCollection = new ServiceCollection()
-                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "OtherLocation"), reset: true);
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "OtherLocation"));
 
             FromConfigAssertion(serviceCollection);
         }
@@ -32,7 +32,7 @@ namespace Relewise.Client.Extensions.Tests
         public void ReadFromConfiguration_WithNamedClients()
         {
             var serviceCollection = new ServiceCollection()
-                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()), reset: true);
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()));
 
             FromConfigAssertion(serviceCollection);
 

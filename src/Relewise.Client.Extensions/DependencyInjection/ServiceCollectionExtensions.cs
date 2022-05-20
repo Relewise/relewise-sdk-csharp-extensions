@@ -7,25 +7,23 @@ namespace Relewise.Client.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    private static readonly RelewiseOptionsBuilder Builder = new();
+    public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptionsBuilder> configure)
+    {
+        return services.AddRelewise((builder, _) => configure(builder));
+    }
 
     /// <summary>
     /// Registers services and configures <see cref="RelewiseOptionsBuilder"/>.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/></param>
     /// <param name="configure">A delegate to configure <see cref="RelewiseOptionsBuilder"/></param>
-    /// <param name="reset">Defines whether any existing configuration should be reset. This is typically not needed.</param>
     /// <returns>The <see cref="IServiceCollection"/></returns>
-    public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptionsBuilder> configure, bool reset = false)
+    public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptionsBuilder, IServiceProvider> configure)
     {
         if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-        if (reset)
-            Builder.Reset();
+        services.AddSingleton(new RelewiseClientFactory.Configure(configure));
 
-        configure.Invoke(Builder);
-
-        services.TryAddSingleton(Builder);
         services.TryAddSingleton<IRelewiseClientFactory, RelewiseClientFactory>();
 
         TryAdd<ITracker, Tracker>(

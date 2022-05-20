@@ -133,13 +133,6 @@ Example (to be used in e.g. appSettings.json):
         public string? ApiKey { get; set; }
         public TimeSpan? Timeout { get; set; }
     }
-
-    internal override void Reset()
-    {
-        base.Reset();
-
-        Named.Clients.Clear();
-    }
 }
 
 public class RelewiseClientsOptionsBuilder : RelewiseClientOptionsBuilder
@@ -161,15 +154,6 @@ public class RelewiseClientsOptionsBuilder : RelewiseClientOptionsBuilder
     /// If no options have been provided, the client will inherit options from the root configuration.
     /// </summary>
     public RelewiseClientOptionsBuilder Searcher { get; } = new();
-
-    internal override void Reset()
-    {
-        base.Reset();
-
-        Tracker.Reset();
-        Recommender.Reset();
-        Searcher.Reset();
-    }
 }
 
 public class RelewiseClientOptionsBuilder
@@ -211,13 +195,6 @@ public class RelewiseClientOptionsBuilder
         TimeSpan timeout = Timeout.GetValueOrDefault(parentOptions?.Timeout ?? TimeSpan.FromSeconds(5));
 
         return new RelewiseClientOptions(datasetId, apiKey!, timeout);
-    }
-
-    internal virtual void Reset()
-    {
-        DatasetId = null;
-        ApiKey = null;
-        Timeout = null;
     }
     
     internal void Initialize(RelewiseClientOptions options)

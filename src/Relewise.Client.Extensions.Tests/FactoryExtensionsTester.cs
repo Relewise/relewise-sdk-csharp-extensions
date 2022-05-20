@@ -22,7 +22,7 @@ public class FactoryExtensionsTester
                 integration.ApiKey = "r4FqfMqtiZjJmoN";
                 integration.Tracker.Timeout = TimeSpan.FromSeconds(20);
             });
-        }, reset: true);
+        });
 
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
@@ -44,7 +44,7 @@ public class FactoryExtensionsTester
             options.ApiKey = "r4FqfMqtiZjJmoN";
 
             options.Named.Add("Integration", _ => { });
-        }, reset: true);
+        });
 
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
@@ -63,7 +63,7 @@ public class FactoryExtensionsTester
             options.ApiKey = "r4FqfMqtiZjJmoN";
 
             options.Named.Add("Integration", _ => { });
-        }, reset: true);
+        });
 
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
@@ -118,7 +118,7 @@ public class FactoryExtensionsTester
     {
         var serviceCollection = new ServiceCollection();
 
-        serviceCollection.AddRelewise(configure, reset: true);
+        serviceCollection.AddRelewise(configure);
 
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
