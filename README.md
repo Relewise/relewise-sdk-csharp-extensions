@@ -10,7 +10,7 @@ Run this command from the NuGet Package Manager Console to install the NuGet pac
 
 ## Features
 
-### Dependency Injection / Wiring up the SDK Client
+### Dependency Injection / Wiring up Relewise clients
 
 We provide a lot of ways to easily add the clients you need. The default way to do that is using the following code:
 ```csharp
@@ -92,4 +92,4 @@ Otherwise you are welcome to open an Issue in our [issue tracker](https://github
 
 ## License
 
-Relewise.Client.Extensions is under the [MIT licensed](./LICENSE)
+Relewise.Client.Extensions is licensed under the [MIT license](./LICENSE)
