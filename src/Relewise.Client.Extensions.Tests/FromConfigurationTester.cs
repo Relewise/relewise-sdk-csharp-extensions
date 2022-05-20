@@ -63,7 +63,7 @@ namespace Relewise.Client.Extensions.Tests
         {
             return new ConfigurationBuilder()
                 .AddInMemoryCollection()
-                .AddJsonFile("appSettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
         }
     }

@@ -2,7 +2,7 @@
 
 ### Relewise.Client.Extensions
 
-You should install Relewise.Client.Extensions with NuGet:
+You should install Relewise.Client.Extensions using NuGet:
 
 > Install-Package Relewise.Client.Extensions
 
@@ -10,75 +10,74 @@ Run this command from the NuGet Package Manager Console to install the NuGet pac
 
 ## Features
 
-### Dependcency Injection / Wiring up the SDK Client
+### Dependency Injection / Wiring up the SDK Client
 
 We provide a lot of ways to easily add the clients you need. The default way to do that is using the following code:
 ```csharp
 services.AddRelewise(options =>
-     {
-         options.DatasetId = Guid.Parse("1B5A09DB-561E-47E0-B8ED-4E559A1B7EB9");
-         options.ApiKey = "r4FqfMqtiZjJmoN";
-         options.Timeout = TimeSpan.FromSeconds(3);
-     });
+{
+    options.DatasetId = Guid.Parse("1B5A09DB-561E-47E0-B8ED-4E559A1B7EB9");
+    options.ApiKey = "r4FqfMqtiZjJmoN";
+    options.Timeout = TimeSpan.FromSeconds(3);
+});
 ```
-This will expose a ITracker, IRecommender and ISearcher for the dataset and apikey specificed above with a request timeout of 3 seconds.
+This will wire up the client instances of `ITracker`, `IRecommender` and `ISearcher`, and these clients will all be configured for the `DatasetId` and `ApiKey` options specificed above, and with a request timeout of 3 seconds.
 
-We recommend that the Dataset Id and API key is stored in a configuration-file. We provide a default way of reading from the appsettings.json:
+We recommend that the `DatasetId` and `ApiKey` are stored in a configuration-file. We provide a default way of reading from the appsettings.json:
 ```csharp
 IConfiguration configuration = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json")
-        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", true)
-        .Build();
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", true)
+    .Build();
         
-services
-    .AddRelewise(options => options.ReadFromConfiguration(configuration));
+services.AddRelewise(options => options.ReadFromConfiguration(configuration));
 ```
 
-The configuration offers a lot of nifty features, should as 
-- Set specific dataset, apikey or timeout for either the tracker, the recommender or the searcher.
+The configuration offers a lot of other great features, such as 
+- Set specific options for `DatasetId`, `ApiKey` and `Timeout` for the individual client instances of `ITracker`, `IRecommender` and `ISearcher`.
 - Named clients to allow different configuration for integrations etc or to use for a multi site-setup.
 
 Here is a full example of all the configuration settings we provide via the appsettings or via the fluent API:
 ```json
-  "Relewise": {
+"Relewise": {
     "DatasetId": "6D9361AA-A23D-4BF2-A818-5ABA792E2102",
     "ApiKey": "r4FqfMqtiZjJmoN",
     "Timeout": "00:00:03",
     "Tracker": {
-      "Timeout": "00:00:10"
+        "Timeout": "00:00:10"
     },
     "Recommender": {
-      "Timeout": "00:00:05"
+        "Timeout": "00:00:05"
     },
     "Searcher": {
-      "Timeout": "00:00:10"
+        "Timeout": "00:00:10"
     },
     "Named": {
-      "Integration": {
-        "Tracker": {
-          "Timeout": "00:01:00"
-        }
-      },
-      "ContentSite": {
-        "DatasetId": "8DF23DAF-6C96-47DB-BE34-84629359D3B8",
-        "ApiKey": "61ce444b6e7c4f",
-        "Timeout": "00:00:10",
-        "Tracker": {
-          "Timeout": "00:00:10"
+        "Integration": {
+            "Tracker": {
+                "Timeout": "00:00:30"
+            }
         },
-        "Recommender": {
-          "Timeout": "00:00:05"
-        },
-        "Searcher": {
-          "Timeout": "00:00:10"
+        "ContentSite": {
+            "DatasetId": "8DF23DAF-6C96-47DB-BE34-84629359D3B8",
+            "ApiKey": "61ce444b6e7c4f",
+            "Timeout": "00:00:03",
+            "Tracker": {
+                "Timeout": "00:00:10"
+            },
+            "Recommender": {
+                "Timeout": "00:00:05"
+            },
+            "Searcher": {
+                "Timeout": "00:00:10"
+            }
         }
-      }
     }
-  }
+}
 ```
 
-When using named clients, you can use the `IRelewiseClientFactory` to get a ITracker, IRecommender or ISearcher:
+When using named clients, you can use the `IRelewiseClientFactory` to retrieve an instance of `ITracker`, `IRecommender` and `ISearcher`:
 ```csharp
 IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
 ITracker tracker = factory.GetClient<ITracker>("Integration");

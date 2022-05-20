@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Relewise.Client.Extensions.Infrastructure.Extensions;
 using Relewise.Client.Search;
@@ -27,7 +26,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         }
         catch (ArgumentException ex)
         {
-            throw new ArgumentException($"Relewise is missing required configuration. {ex.Message}", ex);
+            throw new InvalidOperationException($"Relewise is missing required configuration. {ex.Message}", ex);
         }
 
         RelewiseClientOptions? trackerOptions = AddOptions<ITracker>(globalOptions, options.Tracker);
@@ -68,8 +67,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         }
         catch (ArgumentException ex)
         {
-            Console.WriteLine(ex);
-            throw;
+            throw new InvalidOperationException($"Options for {typeof(T).Name} is missing required information. {ex.Message}", ex);
         }
 
         if (options != null)
@@ -94,8 +92,8 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         }
         catch (ArgumentException ex)
         {
-            throw new ArgumentException(
-                $"Configuring named client '{name}' for '{typeof(TInterface).Name}' resulted in an error: {ex.Message}",
+            throw new InvalidOperationException(
+                $"Named client '{name}' for '{typeof(TInterface).Name}' is missing required configuration. {ex.Message}",
                 ex);
         }
 
@@ -136,8 +134,8 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         if (!_options.TryGetValue(GenerateClientLookupKey<T>(name), out RelewiseClientOptions options))
         {
             string exceptionMessage = name == null
-                ? "No default clients (clients without a name) was registered during startup, thus options cannot be returned."
-                : "No client named '{name}' was registered during startup, thus options cannot be returned.";
+                ? "No options has been configured. Please check your call to the 'services.AddRelewise(options => { /* options goes here */ })'-method."
+                : $@"No client named '{name}' was registered during startup, thus options cannot be returned. Please check your call to the 'services.AddRelewise(options => {{ /* options goes here */ }})'-method.";
 
             throw new ArgumentException(exceptionMessage);
         }
