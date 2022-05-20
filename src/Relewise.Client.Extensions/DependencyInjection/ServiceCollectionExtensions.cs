@@ -53,10 +53,13 @@ public static class ServiceCollectionExtensions
     {
         services.TryAddSingleton<TInterface>(provider =>
         {
-            var builder = provider.GetRequiredService<RelewiseOptionsBuilder>();
+            var options = new RelewiseOptionsBuilder();
 
-            RelewiseClientOptions? globalOptions = builder.Build();
-            RelewiseClientOptions? clientOptions = clientOptionsProvider(builder).Build(globalOptions);
+            foreach (RelewiseClientFactory.Configure configure in provider.GetServices<RelewiseClientFactory.Configure>())
+                configure(options, provider);
+
+            RelewiseClientOptions? globalOptions = options.Build();
+            RelewiseClientOptions? clientOptions = clientOptionsProvider(options).Build(globalOptions);
 
             if (clientOptions == null)
             {
