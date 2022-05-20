@@ -14,15 +14,7 @@ public class ServiceCollectionExtenstionTester
     {
         var serviceCollection = new ServiceCollection();
 
-        Assert.Throws<ArgumentNullException>(() => serviceCollection.AddRelewise(null!));
-    }
-
-    [Test]
-    public void NoOptionsProvided_Exception()
-    {
-        var serviceCollection = new ServiceCollection();
-
-        Assert.Throws<ArgumentException>(() => serviceCollection.AddRelewise(_ => {}));
+        Assert.Throws<ArgumentNullException>(() => serviceCollection.AddRelewise(null!, reset: true));
     }
 
     [Test]
@@ -31,15 +23,17 @@ public class ServiceCollectionExtenstionTester
         var serviceCollection = new ServiceCollection();
 
         var datasetId = Guid.NewGuid();
+
         serviceCollection.AddRelewise(options =>
         {
             options.DatasetId = datasetId;
             options.ApiKey = "r4FqfMqtiZjJmoN";
-        });
+        }, reset: true);
 
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
         var tracker = provider.GetService<ITracker>();
+
         Assert.IsNotNull(tracker);
         Assert.IsNotNull(provider.GetService<IRecommender>());
         Assert.IsNotNull(provider.GetService<ISearcher>());
@@ -58,7 +52,7 @@ public class ServiceCollectionExtenstionTester
             options.DatasetId = Guid.NewGuid();
             options.ApiKey = "r4FqfMqtiZjJmoN";
             options.Tracker.Timeout = trackerRequestTimeout;
-        });
+        }, reset: true);
 
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
@@ -79,7 +73,7 @@ public class ServiceCollectionExtenstionTester
             options.DatasetId = Guid.NewGuid();
             options.ApiKey = "r4FqfMqtiZjJmoN";
             options.Timeout = timeout;
-        });
+        }, reset: true);
 
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 

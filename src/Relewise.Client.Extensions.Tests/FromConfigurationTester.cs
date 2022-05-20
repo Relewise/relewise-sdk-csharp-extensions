@@ -14,7 +14,7 @@ namespace Relewise.Client.Extensions.Tests
         public void ReadFromConfiguration_Default()
         {
             var serviceCollection = new ServiceCollection()
-                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()));
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()), reset: true);
 
             FromConfigAssertion(serviceCollection);
         }
@@ -23,7 +23,7 @@ namespace Relewise.Client.Extensions.Tests
         public void ReadFromConfiguration_SpecificSection()
         {
             var serviceCollection = new ServiceCollection()
-                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "OtherLocation"));
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "OtherLocation"), reset: true);
 
             FromConfigAssertion(serviceCollection);
         }
@@ -32,7 +32,7 @@ namespace Relewise.Client.Extensions.Tests
         public void ReadFromConfiguration_WithNamedClients()
         {
             var serviceCollection = new ServiceCollection()
-                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()));
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()), reset: true);
 
             FromConfigAssertion(serviceCollection);
 
@@ -63,7 +63,7 @@ namespace Relewise.Client.Extensions.Tests
         {
             return new ConfigurationBuilder()
                 .AddInMemoryCollection()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appSettings.json", optional: false, reloadOnChange: false)
                 .Build();
         }
     }

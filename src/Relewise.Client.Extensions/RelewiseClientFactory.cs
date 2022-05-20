@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Relewise.Client.Extensions.Infrastructure.Extensions;
 using Relewise.Client.Search;
@@ -8,69 +9,141 @@ namespace Relewise.Client.Extensions;
 
 internal class RelewiseClientFactory : IRelewiseClientFactory
 {
-    private readonly IReadOnlyDictionary<string, IClient> _clients;
+    private readonly Dictionary<string, IClient> _clients;
+    private readonly Dictionary<string, RelewiseClientOptions> _options;
     private readonly IServiceProvider _provider;
-    private readonly RelewiseOptions _options;
 
-    public RelewiseClientFactory(RelewiseOptions options, IServiceProvider provider)
+    public RelewiseClientFactory(RelewiseOptionsBuilder options, IServiceProvider provider)
     {
-        _options = options;
+        _clients = new Dictionary<string, IClient>();
+        _options = new Dictionary<string, RelewiseClientOptions>();
         _provider = provider;
 
-        var clients = new Dictionary<string, IClient>();
+        RelewiseClientOptions? globalOptions;
 
-        foreach ((string name, RelewiseClientsOptions clientOptions) in options.Named.Clients.AsTuples())
+        try
         {
-            Guid dataSetId = clientOptions.DatasetId ?? options.DatasetId ?? Guid.Empty;
-            if (dataSetId == Guid.Empty)
-                throw new ArgumentException($"Could not find valid dataset id for client with name '{name}'");
-
-            clients.Add(GenerateClientLookupKey<ISearcher>(name), new Searcher(
-                dataSetId,
-                clientOptions.ApiKey ?? options.ApiKey,
-                options.GetTimeout(() => clientOptions.Searcher.Timeout ?? clientOptions.Timeout)));
-
-            clients.Add(GenerateClientLookupKey<ITracker>(name), new Tracker(
-                dataSetId,
-                clientOptions.ApiKey ?? options.ApiKey,
-                options.GetTimeout(() => clientOptions.Tracker.Timeout ?? clientOptions.Timeout)));
-
-            clients.Add(GenerateClientLookupKey<IRecommender>(name), new Recommender(
-                dataSetId,
-                clientOptions.ApiKey ?? options.ApiKey,
-                options.GetTimeout(() => clientOptions.Recommender.Timeout ?? clientOptions.Timeout)));
+            globalOptions = options.Build();
+        }
+        catch (ArgumentException ex)
+        {
+            throw new ArgumentException($"Relewise is missing required configuration. {ex.Message}", ex);
         }
 
-        _clients = clients;
-    }
+        RelewiseClientOptions? trackerOptions = AddOptions<ITracker>(globalOptions, options.Tracker);
+        RelewiseClientOptions? recommenderOptions = AddOptions<IRecommender>(globalOptions, options.Recommender);
+        RelewiseClientOptions? searcherOptions = AddOptions<ISearcher>(globalOptions, options.Searcher);
 
-    public T GetClient<T>() where T : IClient
-    {
-        T? client = _provider.GetService<T>();
-
-        if (client == null)
-            throw new ArgumentException("No client was registered during startup");
-
-        return client;
-    }
-
-    public T GetClient<T>(string name) where T : IClient
-    {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException(@"Value cannot be null or empty", nameof(name));
-
-        if (!_options.Named.Clients.ContainsKey(name))
-            throw new ArgumentException($"No clients with name '{name}' was registered during startup");
-
-        if (!_clients.TryGetValue(GenerateClientLookupKey<T>(name), out IClient client))
+        foreach ((string name, RelewiseClientsOptionsBuilder namedClientOptions) in options.Named.Clients.AsTuples())
         {
-            if (!typeof(T).IsInterface)
-                throw new ArgumentException("Expected generic 'T' to be an interface");
+            AddNamedClient<ITracker, Tracker>(
+                name,
+                namedClientOptions.Build(trackerOptions),
+                namedClientOptions.Tracker,
+                (datasetId, apiKey, timeout) => new Tracker(datasetId, apiKey, timeout));
 
-            throw new ArgumentException($"No clients with name '{name}' was registered during startup");
+            AddNamedClient<IRecommender, Recommender>(
+                name,
+                namedClientOptions.Build(recommenderOptions),
+                namedClientOptions.Recommender,
+                (datasetId, apiKey, timeout) => new Recommender(datasetId, apiKey, timeout));
+
+            AddNamedClient<ISearcher, Searcher>(
+                name,
+                namedClientOptions.Build(searcherOptions),
+                namedClientOptions.Searcher,
+                (datasetId, apiKey, timeout) => new Searcher(datasetId, apiKey, timeout));
+        }
+    }
+
+    private RelewiseClientOptions? AddOptions<T>(
+        RelewiseClientOptions? globalOptions, 
+        RelewiseClientOptionsBuilder clientOptions)
+    {
+        RelewiseClientOptions? options;
+
+        try
+        {
+            options = clientOptions.Build(globalOptions);
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine(ex);
+            throw;
         }
 
-        return (T)client!;
+        if (options != null)
+            _options.Add(GenerateClientLookupKey<T>(), options);
+
+        return options;
     }
 
-    private static string GenerateClientLookupKey<T>(string name) => $"{name}_{typeof(T).Name}";
+    private void AddNamedClient<TInterface, TImplementation>(
+        string name,
+        RelewiseClientOptions? globalClientOptions,
+        RelewiseClientOptionsBuilder namedClientOptions,
+        Func<Guid, string, TimeSpan, TImplementation> create)
+        where TInterface : class, IClient
+        where TImplementation : TInterface
+    {
+        RelewiseClientOptions? options;
+
+        try
+        {
+            options = namedClientOptions.Build(globalClientOptions);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new ArgumentException(
+                $"Configuring named client '{name}' for '{typeof(TInterface).Name}' resulted in an error: {ex.Message}",
+                ex);
+        }
+
+        if (options != null)
+        {
+            TImplementation client = create(
+                options.DatasetId,
+                options.ApiKey,
+                options.Timeout);
+
+            _clients.Add(GenerateClientLookupKey<TInterface>(name), client);
+            _options.Add(GenerateClientLookupKey<TInterface>(name), options);
+        }
+    }
+
+    public T GetClient<T>(string? name = null) where T : class, IClient
+    {
+        if (!typeof(T).IsInterface) throw new ArgumentException($"Expected generic 'T' to be an interface, e.g. {nameof(ITracker)}.");
+
+        if (name == null)
+        {
+            T? client = _provider.GetService<T>();
+
+            if (client == null)
+                throw new ArgumentException($"No client for {typeof(T).Name} was registered during startup");
+
+            return client;
+        }
+
+        if (!_clients.TryGetValue(GenerateClientLookupKey<T>(name), out IClient namedClient))
+            throw new ArgumentException($"No clients with name '{name}' was registered during startup.");
+
+        return (T) namedClient;
+    }
+
+    public RelewiseClientOptions GetOptions<T>(string? name = null) where T : class, IClient
+    {
+        if (!_options.TryGetValue(GenerateClientLookupKey<T>(name), out RelewiseClientOptions options))
+        {
+            string exceptionMessage = name == null
+                ? "No default clients (clients without a name) was registered during startup, thus options cannot be returned."
+                : "No client named '{name}' was registered during startup, thus options cannot be returned.";
+
+            throw new ArgumentException(exceptionMessage);
+        }
+
+        return options;
+    }
+
+    private static string GenerateClientLookupKey<T>(string? name = null) => $"{name}_{typeof(T).Name}";
 }
