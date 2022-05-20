@@ -1,38 +1,82 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Relewise.Client.Search;
 
 namespace Relewise.Client.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptions> options)
+    /// <summary>
+    /// Registers services and configures <see cref="RelewiseOptionsBuilder"/>.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/></param>
+    /// <param name="configure">A delegate to configure <see cref="RelewiseOptionsBuilder"/></param>
+    /// <returns>The <see cref="IServiceCollection"/></returns>
+    public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptionsBuilder> configure)
     {
-        if (options == null) throw new ArgumentNullException(nameof(options));
+        if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-        var config = new RelewiseOptions();
-        options.Invoke(config);
+        return services.AddRelewise((builder, _) => configure(builder));
+    }
 
-        services.AddSingleton(config);
-        services.AddSingleton<IRelewiseClientFactory, RelewiseClientFactory>();
+    /// <summary>
+    /// Registers services and configures <see cref="RelewiseOptionsBuilder"/>.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/></param>
+    /// <param name="configure">A delegate to configure <see cref="RelewiseOptionsBuilder"/> which also includes the <see cref="IServiceProvider"/> if you need to do service lookups part of this configuration.</param>
+    /// <returns>The <see cref="IServiceCollection"/></returns>
+    public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptionsBuilder, IServiceProvider> configure)
+    {
+        if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-        if (!string.IsNullOrWhiteSpace(config.ApiKey) && config.DatasetId.HasValue)
-        {
-            services.AddSingleton<ITracker>(new Tracker(config.DatasetId.GetValueOrDefault(), config.ApiKey, GetTimeout(config, () => config.Tracker.Timeout)));
-            services.AddSingleton<IRecommender>(new Recommender(config.DatasetId.GetValueOrDefault(), config.ApiKey, GetTimeout(config, () => config.Recommender.Timeout)));
-            services.AddSingleton<ISearcher>(new Searcher(config.DatasetId.GetValueOrDefault(), config.ApiKey, GetTimeout(config, () => config.Searcher.Timeout)));
-        }
-        else if (config.Named.Clients.Count == 0)
-        {
-            // TODO perform better validation
-            throw new ArgumentException("The provided options was not in a valid state, either provide a global dataset and ApiKey or provide at least 1 valid named client");
-        }
+        services.AddSingleton(new RelewiseClientFactory.Configure(configure));
+
+        services.TryAddSingleton<IRelewiseClientFactory, RelewiseClientFactory>();
+
+        TryAdd<ITracker, Tracker>(
+            services,
+            options => options.Tracker,
+            (datasetId, apiKey, timeout) => new Tracker(datasetId, apiKey, timeout));
+
+        TryAdd<IRecommender, Recommender>(
+            services,
+            options => options.Recommender,
+            (datasetId, apiKey, timeout) => new Recommender(datasetId, apiKey, timeout));
+
+        TryAdd<ISearcher, Searcher>(
+            services,
+            options => options.Searcher,
+            (datasetId, apiKey, timeout) => new Searcher(datasetId, apiKey, timeout));
 
         return services;
     }
 
-    private static TimeSpan GetTimeout(RelewiseOptions options, Func<TimeSpan?> fromSpecificClient)
+    private static void TryAdd<TInterface, TClass>(
+        IServiceCollection services, 
+        Func<RelewiseOptionsBuilder, RelewiseClientOptionsBuilder> clientOptionsProvider, 
+        Func<Guid, string, TimeSpan, TClass> create)
+        where TInterface : class, IClient
+        where TClass : TInterface
     {
-        return fromSpecificClient() ?? options.Timeout ?? TimeSpan.FromSeconds(5);
+        services.TryAddSingleton<TInterface>(provider =>
+        {
+            var options = new RelewiseOptionsBuilder();
+
+            foreach (RelewiseClientFactory.Configure configure in provider.GetServices<RelewiseClientFactory.Configure>())
+                configure(options, provider);
+
+            RelewiseClientOptions? globalOptions = options.Build();
+            RelewiseClientOptions? clientOptions = clientOptionsProvider(options).Build(globalOptions);
+
+            if (clientOptions == null)
+            {
+                throw new InvalidOperationException($@"No options were given to create a non-named client for {typeof(TInterface).Name}.
+
+To configure this client, use the 'services.AddRelewise(options => {{ ... }});'-method in your startup code.");
+            }
+
+            return create(clientOptions.DatasetId, clientOptions.ApiKey, clientOptions.Timeout);
+        });
     }
 }

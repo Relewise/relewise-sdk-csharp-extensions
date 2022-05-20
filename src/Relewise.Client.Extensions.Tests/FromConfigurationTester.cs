@@ -31,14 +31,22 @@ namespace Relewise.Client.Extensions.Tests
         [Test]
         public void ReadFromConfiguration_WithNamedClients()
         {
-            // TODO Create test
             var serviceCollection = new ServiceCollection()
                 .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration()));
 
             FromConfigAssertion(serviceCollection);
+
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+            IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
+            ITracker tracker = factory.GetClient<ITracker>("ContentSite");
+
+            Assert.IsNotNull(tracker);
+            Assert.AreEqual(Guid.Parse("8DF23DAF-6C96-47DB-BE34-84629359D3B8"), tracker.DatasetId);
+            Assert.AreEqual(TimeSpan.FromSeconds(10), tracker.Timeout);
         }
 
-        public void FromConfigAssertion(IServiceCollection serviceCollection)
+        private static void FromConfigAssertion(IServiceCollection serviceCollection)
         {
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
@@ -55,7 +63,7 @@ namespace Relewise.Client.Extensions.Tests
         {
             return new ConfigurationBuilder()
                 .AddInMemoryCollection()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .Build();
         }
     }

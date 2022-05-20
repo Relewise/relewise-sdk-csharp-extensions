@@ -7,30 +7,15 @@ using Relewise.Client.Search;
 namespace Relewise.Client.Extensions.Tests;
 
 [TestFixture]
-public class ServiceCollectionExtenstionTester
+public class ServiceCollectionExtensionsTester
 {
-    [Test]
-    public void NullFunction_Exception()
-    {
-        var serviceCollection = new ServiceCollection();
-
-        Assert.Throws<ArgumentNullException>(() => serviceCollection.AddRelewise(null!));
-    }
-
-    [Test]
-    public void NoOptionsProvided_Exception()
-    {
-        var serviceCollection = new ServiceCollection();
-
-        Assert.Throws<ArgumentException>(() => serviceCollection.AddRelewise(_ => {}));
-    }
-
     [Test]
     public void AddDatasetIdAndApiKey()
     {
         var serviceCollection = new ServiceCollection();
 
         var datasetId = Guid.NewGuid();
+
         serviceCollection.AddRelewise(options =>
         {
             options.DatasetId = datasetId;
@@ -40,6 +25,7 @@ public class ServiceCollectionExtenstionTester
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
         var tracker = provider.GetService<ITracker>();
+
         Assert.IsNotNull(tracker);
         Assert.IsNotNull(provider.GetService<IRecommender>());
         Assert.IsNotNull(provider.GetService<ISearcher>());

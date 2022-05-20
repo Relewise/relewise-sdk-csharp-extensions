@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Relewise.Client.Extensions.DependencyInjection;
+using Relewise.Client.Search;
 
 namespace Relewise.Client.Extensions.Tests;
 
@@ -69,5 +69,59 @@ public class FactoryExtensionsTester
 
         IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
         Assert.Catch<ArgumentException>(() => factory.GetClient<Tracker>("Integration"));
+    }
+
+    [Test]
+    public void ClientOverrides_GlobalOptions()
+    {
+        RelewiseClientOptions globalOptions = new (Guid.NewGuid(), "GlobalApiKey", TimeSpan.FromSeconds(1));
+        RelewiseClientOptions recommenderOptions = new(Guid.NewGuid(), "RecommenderApiKey", TimeSpan.FromSeconds(3));
+        RelewiseClientOptions searcherOptions = new(Guid.NewGuid(), "SearcherApiKey", TimeSpan.FromSeconds(4));
+
+        IRelewiseClientFactory factory = SetupFactory(options =>
+        {
+            options.Initialize(globalOptions);
+            options.Recommender.Initialize(recommenderOptions);
+            options.Searcher.Initialize(searcherOptions);
+        });
+
+        Assert.AreEqual(globalOptions, factory.GetOptions<ITracker>());
+        Assert.AreEqual(recommenderOptions, factory.GetOptions<IRecommender>());
+        Assert.AreEqual(searcherOptions, factory.GetOptions<ISearcher>());
+    }
+
+
+    [Test]
+    public void NamedClientOverrides_GlobalOptions()
+    {
+        RelewiseClientOptions globalOptions = new(Guid.NewGuid(), "GlobalApiKey", TimeSpan.FromSeconds(1));
+        RelewiseClientOptions recommenderOptions = new(Guid.NewGuid(), "RecommenderApiKey", TimeSpan.FromSeconds(3));
+        RelewiseClientOptions namedRecommenderOptions = new(recommenderOptions.DatasetId, recommenderOptions.ApiKey, TimeSpan.FromSeconds(10));
+
+        IRelewiseClientFactory factory = SetupFactory(options =>
+        {
+            options.Initialize(globalOptions);
+            options.Recommender.Initialize(recommenderOptions);
+            
+            options.Named.Add("Integration", integration =>
+            {
+                integration.Recommender.Initialize(namedRecommenderOptions);
+            });
+        });
+
+        Assert.AreEqual(globalOptions, factory.GetOptions<ITracker>());
+        Assert.AreEqual(recommenderOptions, factory.GetOptions<IRecommender>());
+        Assert.AreEqual(namedRecommenderOptions, factory.GetOptions<IRecommender>("Integration"));
+    }
+
+    private static IRelewiseClientFactory SetupFactory(Action<RelewiseOptionsBuilder> configure)
+    {
+        var serviceCollection = new ServiceCollection();
+
+        serviceCollection.AddRelewise(configure);
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+        return provider.GetRequiredService<IRelewiseClientFactory>();
     }
 }
