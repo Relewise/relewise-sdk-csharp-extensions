@@ -7,8 +7,16 @@ namespace Relewise.Client.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Registers services and configures <see cref="RelewiseOptionsBuilder"/>.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/></param>
+    /// <param name="configure">A delegate to configure <see cref="RelewiseOptionsBuilder"/></param>
+    /// <returns>The <see cref="IServiceCollection"/></returns>
     public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptionsBuilder> configure)
     {
+        if (configure == null) throw new ArgumentNullException(nameof(configure));
+
         return services.AddRelewise((builder, _) => configure(builder));
     }
 
@@ -16,7 +24,7 @@ public static class ServiceCollectionExtensions
     /// Registers services and configures <see cref="RelewiseOptionsBuilder"/>.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/></param>
-    /// <param name="configure">A delegate to configure <see cref="RelewiseOptionsBuilder"/></param>
+    /// <param name="configure">A delegate to configure <see cref="RelewiseOptionsBuilder"/> which also includes the <see cref="IServiceProvider"/> if you need to do service lookups part of this configuration.</param>
     /// <returns>The <see cref="IServiceCollection"/></returns>
     public static IServiceCollection AddRelewise(this IServiceCollection services, Action<RelewiseOptionsBuilder, IServiceProvider> configure)
     {
