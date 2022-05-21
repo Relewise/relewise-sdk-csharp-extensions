@@ -128,7 +128,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
             return client;
         }
 
-        if (!_clients.TryGetValue(GenerateClientLookupKey<T>(name), out IClient namedClient))
+        if (!_clients.TryGetValue(GenerateClientLookupKey<T>(name), out IClient? namedClient))
             throw new ArgumentException($"No clients with name '{name}' was registered during startup.");
 
         return (T) namedClient;
@@ -136,7 +136,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 
     public RelewiseClientOptions GetOptions<T>(string? name = null) where T : class, IClient
     {
-        if (!_options.TryGetValue(GenerateClientLookupKey<T>(name), out RelewiseClientOptions options))
+        if (!_options.TryGetValue(GenerateClientLookupKey<T>(name), out RelewiseClientOptions? options))
         {
             string exceptionMessage = name == null
                 ? "No options has been configured. Please check your call to the 'services.AddRelewise(options => { /* options goes here */ })'-method."
