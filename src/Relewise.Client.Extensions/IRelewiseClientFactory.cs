@@ -1,8 +1,24 @@
-﻿namespace Relewise.Client.Extensions;
+﻿using System;
 
+namespace Relewise.Client.Extensions;
+
+/// <summary>
+/// The Service Locator / factory from where you can access all configured clients.
+/// In instance of this interface can be located through the <see cref="IServiceProvider"/> instance directly - or indirectly through dependency injection.
+/// </summary>
 public interface IRelewiseClientFactory
 {
-    T GetClient<T>(string? name = null) where T : class, IClient;
+    /// <summary>
+    /// Provides access to a specific client.
+    /// </summary>
+    /// <typeparam name="TClient">Defines which client you'd like to access, e.g. <see cref="ITracker"/>.</typeparam>
+    /// <param name="name">Optional parameter if you are accessing a named client.</param>
+    TClient GetClient<TClient>(string? name = null) where TClient : class, IClient;
 
-    RelewiseClientOptions GetOptions<T>(string? name = null) where T : class, IClient;
+    /// <summary>
+    /// Provides access to the options used to configure the specific client.
+    /// </summary>
+    /// <typeparam name="TClient">Defines for which client you'd like to access options, e.g. <see cref="ITracker"/>.</typeparam>
+    /// <param name="name">Optional parameter if you are accessing options for a named client.</param>
+    RelewiseClientOptions GetOptions<TClient>(string? name = null) where TClient : class, IClient;
 }

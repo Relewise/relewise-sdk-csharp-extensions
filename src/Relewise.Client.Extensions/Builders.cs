@@ -6,6 +6,9 @@ using Relewise.Client.Extensions.Infrastructure.Extensions;
 
 namespace Relewise.Client.Extensions;
 
+/// <summary>
+/// Represents the root configuration of Relewise.
+/// </summary>
 public class RelewiseOptionsBuilder : RelewiseClientsOptionsBuilder
 {
     /// <summary>
@@ -14,6 +17,10 @@ public class RelewiseOptionsBuilder : RelewiseClientsOptionsBuilder
     /// </summary>
     public NamedBuilder Named { get; } = new();
 
+    /// <summary>
+    /// Reads and sets all options from the <see cref="IConfiguration"/> instance.
+    /// Simply just parse the instance typically available in the Startup/Bootstrap code of your application.
+    /// </summary>
     public RelewiseOptionsBuilder ReadFromConfiguration(IConfiguration configuration, string sectionName = "Relewise")
     {
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -54,6 +61,11 @@ Example (to be used in e.g. appSettings.json):
 {JsonConvert.SerializeObject(configuration, settings)}";
     }
     
+    /// <summary>
+    /// Represents configuration of named clients, if you're using this functionality.
+    /// Named clients allows you to configure access to multiple datasets from the same application, e.g. for multi-site purposes.
+    /// Named clients also allows you to override e.g. timeout of default clients - this is typically handy for integration scenarios.
+    /// </summary>
     public class NamedBuilder
     {
         internal Dictionary<string, RelewiseClientsOptionsBuilder> Clients { get; } = new();
@@ -135,6 +147,9 @@ Example (to be used in e.g. appSettings.json):
     }
 }
 
+/// <summary>
+/// Represents options available to the different clients of Relewise.
+/// </summary>
 public class RelewiseClientsOptionsBuilder : RelewiseClientOptionsBuilder
 {
     /// <summary>
@@ -156,6 +171,9 @@ public class RelewiseClientsOptionsBuilder : RelewiseClientOptionsBuilder
     public RelewiseClientOptionsBuilder Searcher { get; } = new();
 }
 
+/// <summary>
+/// Represents the options available for a single client.
+/// </summary>
 public class RelewiseClientOptionsBuilder
 {
     /// <summary>
@@ -194,7 +212,7 @@ public class RelewiseClientOptionsBuilder
 
         TimeSpan timeout = Timeout.GetValueOrDefault(parentOptions?.Timeout ?? TimeSpan.FromSeconds(5));
 
-        return new RelewiseClientOptions(datasetId, apiKey!, timeout);
+        return new RelewiseClientOptions(datasetId, apiKey, timeout);
     }
     
     internal void Initialize(RelewiseClientOptions options)

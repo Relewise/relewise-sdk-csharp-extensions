@@ -5,6 +5,9 @@ using Relewise.Client.Search;
 
 namespace Relewise.Client.Extensions.DependencyInjection;
 
+/// <summary>
+/// Extensions methods for setting up Relewise in an <see cref="IServiceCollection"/>.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
