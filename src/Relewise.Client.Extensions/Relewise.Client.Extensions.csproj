@@ -13,7 +13,8 @@
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageTags>Relewise;Recommendations;Search;SearchEngine;Personalization;Recommender</PackageTags>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<License>http://opensource.org/licenses/MIT</License>
+		<PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/Relewise/relewise-sdk-csharp-extensions</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Relewise/relewise-sdk-csharp-extensions</RepositoryUrl>
 		<PackageId>Relewise.Client.Extensions</PackageId>
