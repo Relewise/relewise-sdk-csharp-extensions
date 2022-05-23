@@ -207,7 +207,7 @@ public class RelewiseClientOptionsBuilder
 
         string? apiKey = ApiKey ?? parentOptions?.ApiKey;
 
-        if (string.IsNullOrWhiteSpace(apiKey))
+        if (apiKey is null || string.IsNullOrWhiteSpace(apiKey)) // compiler is not happy about only having the string.IsNullOrWhiteSpace-check
             throw new ArgumentException($@"Value for '{nameof(ApiKey)} cannot be null or empty. The correct value can be found using https://my.relewise.com.", nameof(ApiKey));
 
         TimeSpan timeout = Timeout.GetValueOrDefault(parentOptions?.Timeout ?? TimeSpan.FromSeconds(5));
