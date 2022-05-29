@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Relewise.Client.Extensions.Infrastructure.Extensions;
 using Relewise.Client.Search;
@@ -148,9 +150,19 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         return options;
     }
 
-    public IReadOnlyDictionary<string, RelewiseClientOptions> NamedClientOptions => _options;
+    public RelewiseNamedClientOptions[] NamedClientOptions => _options.Select(x => new RelewiseNamedClientOptions(x.Key, x.Value)).ToArray();
 
     private static string GenerateClientLookupKey<T>(string? name = null) => $"{name}_{typeof(T).Name}";
 
     public delegate void Configure(RelewiseOptionsBuilder builder, IServiceProvider services);
+
+    public IEnumerator<RelewiseNamedClientOptions> GetEnumerator()
+    {
+        return NamedClientOptions.AsEnumerable().GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }

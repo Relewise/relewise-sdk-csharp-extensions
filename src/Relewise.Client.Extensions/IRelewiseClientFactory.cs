@@ -7,7 +7,7 @@ namespace Relewise.Client.Extensions;
 /// The Service Locator / factory from where you can access all configured clients.
 /// In instance of this interface can be located through the <see cref="IServiceProvider"/> instance directly - or indirectly through dependency injection.
 /// </summary>
-public interface IRelewiseClientFactory
+public interface IRelewiseClientFactory : IEnumerable<RelewiseNamedClientOptions>
 {
     /// <summary>
     /// Provides access to a specific client.
@@ -26,5 +26,5 @@ public interface IRelewiseClientFactory
     /// <summary>
     /// Provides access to all options configured for all the named clients
     /// </summary>
-    IReadOnlyDictionary<string, RelewiseClientOptions> NamedClientOptions { get; }
+    RelewiseNamedClientOptions[] NamedClientOptions { get; }
 }
