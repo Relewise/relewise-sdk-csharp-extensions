@@ -148,6 +148,8 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         return options;
     }
 
+    public IReadOnlyDictionary<string, RelewiseClientOptions> GetNamedOptions => _options;
+
     private static string GenerateClientLookupKey<T>(string? name = null) => $"{name}_{typeof(T).Name}";
 
     public delegate void Configure(RelewiseOptionsBuilder builder, IServiceProvider services);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Relewise.Client.Extensions;
 
@@ -21,4 +22,9 @@ public interface IRelewiseClientFactory
     /// <typeparam name="TClient">Defines for which client you'd like to access options, e.g. <see cref="ITracker"/>.</typeparam>
     /// <param name="name">Optional parameter if you are accessing options for a named client.</param>
     RelewiseClientOptions GetOptions<TClient>(string? name = null) where TClient : class, IClient;
+
+    /// <summary>
+    /// Provides access to all options configured for all the named clients
+    /// </summary>
+    IReadOnlyDictionary<string, RelewiseClientOptions> NamedClientOptions { get; }
 }
