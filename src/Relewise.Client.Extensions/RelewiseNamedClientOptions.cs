@@ -5,10 +5,18 @@
 /// </summary>
 public class RelewiseNamedClientOptions
 {
-    internal RelewiseNamedClientOptions(string name, RelewiseClientOptions options)
+    internal RelewiseNamedClientOptions(
+        string name, 
+        RelewiseClientOptions? globalOptions, 
+        RelewiseClientOptions? tracker,
+        RelewiseClientOptions? recommender, 
+        RelewiseClientOptions? searcher)
     {
         Name = name;
-        Options = options;
+        Options = globalOptions;
+        Tracker = tracker;
+        Recommender = recommender;
+        Searcher = searcher;
     }
 
     /// <summary>
@@ -19,5 +27,20 @@ public class RelewiseNamedClientOptions
     /// <summary>
     /// The options configured for the client
     /// </summary>
-    public RelewiseClientOptions Options { get; }
+    public RelewiseClientOptions? Options { get; }
+
+    /// <summary>
+    /// The options configured for the clients Tracker
+    /// </summary>
+    public RelewiseClientOptions? Tracker { get; }
+
+    /// <summary>
+    /// The options configured for the clients Recommender
+    /// </summary>
+    public RelewiseClientOptions? Recommender { get; }
+
+    /// <summary>
+    /// The options configured for the clients Searcher
+    /// </summary>
+    public RelewiseClientOptions? Searcher { get; }
 }

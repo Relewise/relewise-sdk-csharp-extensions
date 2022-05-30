@@ -13,12 +13,14 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
     private readonly IServiceProvider _provider;
     private readonly Dictionary<string, IClient> _clients;
     private readonly Dictionary<string, RelewiseClientOptions> _options;
+    private readonly Dictionary<string, RelewiseNamedClientOptions> _namedOptions;
 
     public RelewiseClientFactory(IServiceProvider provider)
     {
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         _clients = new Dictionary<string, IClient>();
         _options = new Dictionary<string, RelewiseClientOptions>();
+        _namedOptions = new Dictionary<string, RelewiseNamedClientOptions>();
 
         var options = new RelewiseOptionsBuilder();
 
@@ -42,28 +44,36 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 
         foreach ((string name, RelewiseClientsOptionsBuilder namedClientOptions) in options.Named.Clients.AsTuples())
         {
-            AddNamedClient<ITracker, Tracker>(
+            RelewiseClientOptions? tracker = AddNamedClient<ITracker, Tracker>(
                 name,
                 namedClientOptions.Build(trackerOptions),
                 namedClientOptions.Tracker,
                 (datasetId, apiKey, timeout) => new Tracker(datasetId, apiKey, timeout));
 
-            AddNamedClient<IRecommender, Recommender>(
+            RelewiseClientOptions? recommender = AddNamedClient<IRecommender, Recommender>(
                 name,
                 namedClientOptions.Build(recommenderOptions),
                 namedClientOptions.Recommender,
                 (datasetId, apiKey, timeout) => new Recommender(datasetId, apiKey, timeout));
 
-            AddNamedClient<ISearcher, Searcher>(
+            RelewiseClientOptions? searcher = AddNamedClient<ISearcher, Searcher>(
                 name,
                 namedClientOptions.Build(searcherOptions),
                 namedClientOptions.Searcher,
                 (datasetId, apiKey, timeout) => new Searcher(datasetId, apiKey, timeout));
+
+            _namedOptions.Add(name, new RelewiseNamedClientOptions(
+                name,
+                namedClientOptions.Build(globalOptions),
+                tracker,
+                recommender,
+                searcher));
+
         }
     }
 
     private RelewiseClientOptions? AddOptions<T>(
-        RelewiseClientOptions? globalOptions, 
+        RelewiseClientOptions? globalOptions,
         RelewiseClientOptionsBuilder clientOptions)
     {
         RelewiseClientOptions? options;
@@ -83,7 +93,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         return options;
     }
 
-    private void AddNamedClient<TInterface, TImplementation>(
+    private RelewiseClientOptions? AddNamedClient<TInterface, TImplementation>(
         string name,
         RelewiseClientOptions? globalClientOptions,
         RelewiseClientOptionsBuilder namedClientOptions,
@@ -113,7 +123,11 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 
             _clients.Add(GenerateClientLookupKey<TInterface>(name), client);
             _options.Add(GenerateClientLookupKey<TInterface>(name), options);
+
+            return options;
         }
+
+        return default;
     }
 
     public T GetClient<T>(string? name = null) where T : class, IClient
@@ -133,7 +147,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         if (!_clients.TryGetValue(GenerateClientLookupKey<T>(name), out IClient? namedClient))
             throw new ArgumentException($"No clients with name '{name}' was registered during startup.");
 
-        return (T) namedClient;
+        return (T)namedClient;
     }
 
     public RelewiseClientOptions GetOptions<T>(string? name = null) where T : class, IClient
@@ -150,7 +164,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         return options;
     }
 
-    public RelewiseNamedClientOptions[] NamedClientOptions => _options.Select(x => new RelewiseNamedClientOptions(x.Key, x.Value)).ToArray();
+    public RelewiseNamedClientOptions[] NamedClientOptions => _namedOptions.Values.ToArray();
 
     private static string GenerateClientLookupKey<T>(string? name = null) => $"{name}_{typeof(T).Name}";
 
@@ -158,7 +172,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 
     public IEnumerator<RelewiseNamedClientOptions> GetEnumerator()
     {
-        return NamedClientOptions.AsEnumerable().GetEnumerator();
+        return _namedOptions.Values.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
