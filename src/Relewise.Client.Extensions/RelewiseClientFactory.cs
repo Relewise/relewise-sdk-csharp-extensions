@@ -11,12 +11,14 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
     private readonly IServiceProvider _provider;
     private readonly Dictionary<string, IClient> _clients;
     private readonly Dictionary<string, RelewiseClientOptions> _options;
+    private readonly List<string> _clientNames;
 
     public RelewiseClientFactory(IServiceProvider provider)
     {
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         _clients = new Dictionary<string, IClient>();
         _options = new Dictionary<string, RelewiseClientOptions>();
+        _clientNames = new List<string>();
 
         var options = new RelewiseOptionsBuilder();
 
@@ -40,6 +42,8 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 
         foreach ((string name, RelewiseClientsOptionsBuilder namedClientOptions) in options.Named.Clients.AsTuples())
         {
+            _clientNames.Add(name);
+
             AddNamedClient<ITracker, Tracker>(
                 name,
                 namedClientOptions.Build(trackerOptions),
@@ -147,6 +151,8 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
 
         return options;
     }
+
+    public string[] ClientNames => _clientNames.ToArray();
 
     private static string GenerateClientLookupKey<T>(string? name = null) => $"{name}_{typeof(T).Name}";
 
