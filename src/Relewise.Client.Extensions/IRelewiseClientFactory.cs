@@ -22,7 +22,6 @@ public interface IRelewiseClientFactory
     /// <param name="name">Optional parameter if you are accessing options for a named client.</param>
     RelewiseClientOptions GetOptions<TClient>(string? name = null) where TClient : class, IClient;
 
-
     /// <summary>
     /// Returns a list of all the client names that was registered during StartUp. This can be used to loop over the clients to read their configured options.
     /// </summary>
