@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Relewise.Client.Extensions;
 
@@ -25,5 +26,5 @@ public interface IRelewiseClientFactory
     /// <summary>
     /// Returns a list of all the client names that was registered during StartUp. This can be used to loop over the clients to read their configured options.
     /// </summary>
-    string[] ClientNames { get; }
+    IReadOnlyCollection<string> ClientNames { get; }
 }

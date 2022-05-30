@@ -152,7 +152,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         return options;
     }
 
-    public string[] ClientNames => _clientNames.ToArray();
+    public IReadOnlyCollection<string> ClientNames => _clientNames;
 
     private static string GenerateClientLookupKey<T>(string? name = null) => $"{name}_{typeof(T).Name}";
 
