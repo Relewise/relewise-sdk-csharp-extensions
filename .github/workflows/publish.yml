@@ -1,3 +1,5 @@
+name: publish to NuGet
+
 on:
   push:
     tags:
