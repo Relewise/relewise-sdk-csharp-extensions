@@ -25,4 +25,4 @@ jobs:
     - name: Push
       run: dotnet nuget push Relewise.Client.Extensions.${VERSION}.nupkg --source https://nuget.pkg.github.com/Relewise/index.json --api-key ${NUGET_TOKEN}
       env:
-        GITHUB_TOKEN: ${{ secrets.NUGET_RELEWISE_CLIENT_EXTENSIONS_TOKEN }}
+        NUGET_TOKEN: ${{ secrets.NUGET_RELEWISE_CLIENT_EXTENSIONS_TOKEN }}
