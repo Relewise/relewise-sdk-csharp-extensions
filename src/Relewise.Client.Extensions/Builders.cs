@@ -212,7 +212,7 @@ public class RelewiseClientOptionsBuilder
 
         TimeSpan timeout = Timeout.GetValueOrDefault(parentOptions?.Timeout ?? TimeSpan.FromSeconds(5));
 
-        return new RelewiseClientOptions(datasetId, apiKey, timeout);
+        return new RelewiseClientOptions(datasetId, apiKey!, timeout);
     }
     
     internal void Initialize(RelewiseClientOptions options)
