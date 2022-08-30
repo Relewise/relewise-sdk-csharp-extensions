@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Relewise.Client.Extensions;
 
@@ -21,4 +22,9 @@ public interface IRelewiseClientFactory
     /// <typeparam name="TClient">Defines for which client you'd like to access options, e.g. <see cref="ITracker"/>.</typeparam>
     /// <param name="name">Optional parameter if you are accessing options for a named client.</param>
     RelewiseClientOptions GetOptions<TClient>(string? name = null) where TClient : class, IClient;
+
+    /// <summary>
+    /// Returns a list of all the client names that was registered during StartUp. This can be used to loop over the clients to read their configured options.
+    /// </summary>
+    IReadOnlyCollection<string> ClientNames { get; }
 }

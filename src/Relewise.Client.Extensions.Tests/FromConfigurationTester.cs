@@ -42,7 +42,7 @@ namespace Relewise.Client.Extensions.Tests
             ITracker tracker = factory.GetClient<ITracker>("ContentSite");
 
             Assert.IsNotNull(tracker);
-            Assert.AreEqual(Guid.Parse("8DF23DAF-6C96-47DB-BE34-84629359D3B8"), tracker.DatasetId);
+            Assert.AreEqual(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8"), tracker.DatasetId);
             Assert.AreEqual(TimeSpan.FromSeconds(10), tracker.Timeout);
         }
 

@@ -23,7 +23,7 @@ services.AddRelewise(options =>
 ```
 This will wire up the client instances of `ITracker`, `IRecommender` and `ISearcher`, and these clients will all be configured for the `DatasetId` and `ApiKey` options specificed above, and with a request timeout of 3 seconds.
 
-We recommend that the `DatasetId` and `ApiKey` are stored in a configuration-file. We provide a default way of reading from the appsettings.json:
+We recommend that the `DatasetId` and `ApiKey` are stored in a configuration-file. We provide a default way of reading from the appsettings.json, see `options.ReadFromConfiguration(configuration)` below:
 ```csharp
 IConfiguration configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
