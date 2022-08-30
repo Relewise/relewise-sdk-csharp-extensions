@@ -21,4 +21,9 @@ public interface IRelewiseClientFactory
     /// <typeparam name="TClient">Defines for which client you'd like to access options, e.g. <see cref="ITracker"/>.</typeparam>
     /// <param name="name">Optional parameter if you are accessing options for a named client.</param>
     RelewiseClientOptions GetOptions<TClient>(string? name = null) where TClient : class, IClient;
+
+    /// <summary>Determines whether the factory contains the specified client.</summary>
+    /// <typeparam name="TClient">Defines for which client you'd like to access options, e.g. <see cref="ITracker"/>.</typeparam>
+    /// <param name="name">Optional parameter if you are accessing options for a named client.</param>
+    bool Contains<TClient>(string? name = null) where TClient : class, IClient;
 }
