@@ -133,6 +133,18 @@ Example (to be used in e.g. appSettings.json):
                         named.ApiKey = namedOptions.ApiKey;
                         named.DatasetId = namedOptions.DatasetId;
                         named.Timeout = namedOptions.Timeout;
+
+                        named.Tracker.DatasetId = namedOptions.Tracker.DatasetId;
+                        named.Tracker.ApiKey = namedOptions.Tracker.ApiKey;
+                        named.Tracker.Timeout = namedOptions.Tracker.Timeout;
+
+                        named.Searcher.DatasetId = namedOptions.Searcher.DatasetId;
+                        named.Searcher.ApiKey = namedOptions.Searcher.ApiKey;
+                        named.Searcher.Timeout = namedOptions.Searcher.Timeout;
+
+                        named.Recommender.DatasetId = namedOptions.Recommender.DatasetId;
+                        named.Recommender.ApiKey = namedOptions.Recommender.ApiKey;
+                        named.Recommender.Timeout = namedOptions.Recommender.Timeout;
                     }, throwIfExists: true);
                 }
             }
@@ -207,7 +219,7 @@ public class RelewiseClientOptionsBuilder
 
         string? apiKey = ApiKey ?? parentOptions?.ApiKey;
 
-        if (string.IsNullOrWhiteSpace(apiKey))
+        if (apiKey is null || string.IsNullOrWhiteSpace(apiKey)) // compiler is not happy about only having the string.IsNullOrWhiteSpace-check
             throw new ArgumentException($@"Value for '{nameof(ApiKey)} cannot be null or empty. The correct value can be found using https://my.relewise.com.", nameof(ApiKey));
 
         TimeSpan timeout = Timeout.GetValueOrDefault(parentOptions?.Timeout ?? TimeSpan.FromSeconds(5));
