@@ -118,29 +118,29 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         }
     }
 
-    public T GetClient<T>(string? name = null) where T : class, IClient
+    public TClient GetClient<TClient>(string? name = null) where TClient : class, IClient
     {
-        if (!typeof(T).IsInterface) throw new ArgumentException($"Expected generic 'T' to be an interface, e.g. {nameof(ITracker)}.");
+        if (!typeof(TClient).IsInterface) throw new ArgumentException($"Expected generic 'T' to be an interface, e.g. {nameof(ITracker)}.");
 
         if (name == null)
         {
-            T? client = _provider.GetService<T>();
+            TClient? client = _provider.GetService<TClient>();
 
             if (client == null)
-                throw new ArgumentException($"No client for {typeof(T).Name} was registered during startup");
+                throw new ArgumentException($"No client for {typeof(TClient).Name} was registered during startup");
 
             return client;
         }
 
-        if (!_clients.TryGetValue(GenerateClientLookupKey<T>(name), out IClient? namedClient))
+        if (!_clients.TryGetValue(GenerateClientLookupKey<TClient>(name), out IClient? namedClient))
             throw new ArgumentException($"No clients with name '{name}' was registered during startup.");
 
-        return (T) namedClient;
+        return (TClient) namedClient;
     }
 
-    public RelewiseClientOptions GetOptions<T>(string? name = null) where T : class, IClient
+    public RelewiseClientOptions GetOptions<TClient>(string? name = null) where TClient : class, IClient
     {
-        if (!_options.TryGetValue(GenerateClientLookupKey<T>(name), out RelewiseClientOptions? options))
+        if (!_options.TryGetValue(GenerateClientLookupKey<TClient>(name), out RelewiseClientOptions? options))
         {
             string exceptionMessage = name == null
                 ? "No options has been configured. Please check your call to the 'services.AddRelewise(options => { /* options goes here */ })'-method."
@@ -150,6 +150,11 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         }
 
         return options;
+    }
+
+    public bool Contains<TClient>(string? name = null) where TClient : class, IClient
+    {
+        return _options.ContainsKey(GenerateClientLookupKey<TClient>(name));
     }
 
     public IReadOnlyCollection<string> ClientNames => _clientNames;
