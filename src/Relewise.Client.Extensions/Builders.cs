@@ -132,12 +132,12 @@ Example (to be used in e.g. appSettings.json):
                         named.DatasetId = namedOptions.DatasetId;
                         named.Timeout = namedOptions.Timeout;
 
-                        MapClientConfig(namedOptions.Tracker, Tracker);
-                        MapClientConfig(namedOptions.Searcher, Searcher);
-                        MapClientConfig(namedOptions.Recommender, Recommender);
-                        MapClientConfig(namedOptions.DataAccessor, DataAccessor);
-                        MapClientConfig(namedOptions.SearchAdministrator, SearchAdministrator);
-                        MapClientConfig(namedOptions.Analyzer, Analyzer);
+                        MapClientConfig(named.Tracker, namedOptions.Tracker);
+                        MapClientConfig(named.Searcher, namedOptions.Searcher);
+                        MapClientConfig(named.Recommender, namedOptions.Recommender);
+                        MapClientConfig(named.DataAccessor, namedOptions.DataAccessor);
+                        MapClientConfig(named.SearchAdministrator, namedOptions.SearchAdministrator);
+                        MapClientConfig(named.Analyzer, namedOptions.Analyzer);
 
                     }, throwIfExists: true);
                 }
@@ -149,6 +149,13 @@ Example (to be used in e.g. appSettings.json):
             options.DatasetId = config?.DatasetId;
             options.ApiKey = config?.ApiKey;
             options.Timeout = config?.Timeout;
+        }
+
+        private static void MapClientConfig(RelewiseClientOptionsBuilder options, RelewiseClientOptionsBuilder config)
+        {
+            options.DatasetId = config.DatasetId;
+            options.ApiKey = config.ApiKey;
+            options.Timeout = config.Timeout;
         }
     }
 
@@ -190,13 +197,13 @@ public class RelewiseClientsOptionsBuilder : RelewiseClientOptionsBuilder
     public RelewiseClientOptionsBuilder DataAccessor { get; } = new();
 
     /// <summary>
-    /// Defines options for the <see cref="Relewise.Client.Search.SearchAdministrator"/> client.
+    /// Defines options for the <see cref="Relewise.Client.Search.ISearchAdministrator"/> client.
     /// If no options have been provided, the client will inherit options from the root configuration.
     /// </summary>
     public RelewiseClientOptionsBuilder SearchAdministrator { get; } = new();
 
     /// <summary>
-    /// Defines options for the <see cref="Relewise.Client.Analyzer"/> client.
+    /// Defines options for the <see cref="Relewise.Client.IAnalyzer"/> client.
     /// If no options have been provided, the client will inherit options from the root configuration.
     /// </summary>
     public RelewiseClientOptionsBuilder Analyzer { get; } = new();
