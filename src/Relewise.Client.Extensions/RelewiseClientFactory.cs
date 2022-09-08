@@ -61,6 +61,24 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 namedClientOptions.Build(searcherOptions),
                 namedClientOptions.Searcher,
                 (datasetId, apiKey, timeout) => new Searcher(datasetId, apiKey, timeout));
+
+            AddNamedClient<IDataAccessor, DataAccessor>(
+                name,
+                namedClientOptions.Build(searcherOptions),
+                namedClientOptions.DataAccessor,
+                (datasetId, apiKey, timeout) => new DataAccessor(datasetId, apiKey, timeout));
+
+            AddNamedClient<ISearchAdministrator, SearchAdministrator>(
+                name,
+                namedClientOptions.Build(searcherOptions),
+                namedClientOptions.SearchAdministrator,
+                (datasetId, apiKey, timeout) => new SearchAdministrator(datasetId, apiKey, timeout));
+
+            AddNamedClient<IAnalyzer, Analyzer>(
+                name,
+                namedClientOptions.Build(searcherOptions),
+                namedClientOptions.Analyzer,
+                (datasetId, apiKey, timeout) => new Analyzer(datasetId, apiKey, timeout));
         }
     }
 
