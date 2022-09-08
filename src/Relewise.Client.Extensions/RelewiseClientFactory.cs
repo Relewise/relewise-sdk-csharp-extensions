@@ -39,6 +39,9 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         RelewiseClientOptions? trackerOptions = AddOptions<ITracker>(globalOptions, options.Tracker);
         RelewiseClientOptions? recommenderOptions = AddOptions<IRecommender>(globalOptions, options.Recommender);
         RelewiseClientOptions? searcherOptions = AddOptions<ISearcher>(globalOptions, options.Searcher);
+        RelewiseClientOptions? searchAdministratorOptions = AddOptions<ISearchAdministrator>(globalOptions, options.SearchAdministrator);
+        RelewiseClientOptions? analyzerOptions = AddOptions<IAnalyzer>(globalOptions, options.Analyzer);
+        RelewiseClientOptions? dataAccessorOptions = AddOptions<IDataAccessor>(globalOptions, options.DataAccessor);
 
         foreach ((string name, RelewiseClientsOptionsBuilder namedClientOptions) in options.Named.Clients.AsTuples())
         {
@@ -61,6 +64,24 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 namedClientOptions.Build(searcherOptions),
                 namedClientOptions.Searcher,
                 (datasetId, apiKey, timeout) => new Searcher(datasetId, apiKey, timeout));
+
+            AddNamedClient<IDataAccessor, DataAccessor>(
+                name,
+                namedClientOptions.Build(dataAccessorOptions),
+                namedClientOptions.DataAccessor,
+                (datasetId, apiKey, timeout) => new DataAccessor(datasetId, apiKey, timeout));
+
+            AddNamedClient<ISearchAdministrator, SearchAdministrator>(
+                name,
+                namedClientOptions.Build(searchAdministratorOptions),
+                namedClientOptions.SearchAdministrator,
+                (datasetId, apiKey, timeout) => new SearchAdministrator(datasetId, apiKey, timeout));
+
+            AddNamedClient<IAnalyzer, Analyzer>(
+                name,
+                namedClientOptions.Build(analyzerOptions),
+                namedClientOptions.Analyzer,
+                (datasetId, apiKey, timeout) => new Analyzer(datasetId, apiKey, timeout));
         }
     }
 

@@ -103,6 +103,9 @@ Example (to be used in e.g. appSettings.json):
         public ClientJsonConfiguration? Tracker { get; }
         public ClientJsonConfiguration? Recommender { get; }
         public ClientJsonConfiguration? Searcher { get; }
+        public ClientJsonConfiguration? DataAccessor { get; }
+        public ClientJsonConfiguration? SearchAdministrator { get; }
+        public ClientJsonConfiguration? Analyzer { get; }
 
         public Dictionary<string, RelewiseClientsOptionsBuilder>? Named { get; set; }
 
@@ -112,17 +115,12 @@ Example (to be used in e.g. appSettings.json):
             options.DatasetId = DatasetId;
             options.Timeout = Timeout;
 
-            options.Tracker.DatasetId = Tracker?.DatasetId;
-            options.Tracker.ApiKey = Tracker?.ApiKey;
-            options.Tracker.Timeout = Tracker?.Timeout;
-
-            options.Searcher.DatasetId = Searcher?.DatasetId;
-            options.Searcher.ApiKey = Searcher?.ApiKey;
-            options.Searcher.Timeout = Searcher?.Timeout;
-
-            options.Recommender.DatasetId = Recommender?.DatasetId;
-            options.Recommender.ApiKey = Recommender?.ApiKey;
-            options.Recommender.Timeout = Recommender?.Timeout;
+            MapClientConfig(options.Tracker, Tracker);
+            MapClientConfig(options.Searcher, Searcher);
+            MapClientConfig(options.Recommender, Recommender);
+            MapClientConfig(options.DataAccessor, DataAccessor);
+            MapClientConfig(options.SearchAdministrator, SearchAdministrator);
+            MapClientConfig(options.Analyzer, Analyzer);
 
             if (Named is { Count: > 0 })
             {
@@ -134,20 +132,30 @@ Example (to be used in e.g. appSettings.json):
                         named.DatasetId = namedOptions.DatasetId;
                         named.Timeout = namedOptions.Timeout;
 
-                        named.Tracker.DatasetId = namedOptions.Tracker.DatasetId;
-                        named.Tracker.ApiKey = namedOptions.Tracker.ApiKey;
-                        named.Tracker.Timeout = namedOptions.Tracker.Timeout;
+                        MapClientConfig(named.Tracker, namedOptions.Tracker);
+                        MapClientConfig(named.Searcher, namedOptions.Searcher);
+                        MapClientConfig(named.Recommender, namedOptions.Recommender);
+                        MapClientConfig(named.DataAccessor, namedOptions.DataAccessor);
+                        MapClientConfig(named.SearchAdministrator, namedOptions.SearchAdministrator);
+                        MapClientConfig(named.Analyzer, namedOptions.Analyzer);
 
-                        named.Searcher.DatasetId = namedOptions.Searcher.DatasetId;
-                        named.Searcher.ApiKey = namedOptions.Searcher.ApiKey;
-                        named.Searcher.Timeout = namedOptions.Searcher.Timeout;
-
-                        named.Recommender.DatasetId = namedOptions.Recommender.DatasetId;
-                        named.Recommender.ApiKey = namedOptions.Recommender.ApiKey;
-                        named.Recommender.Timeout = namedOptions.Recommender.Timeout;
                     }, throwIfExists: true);
                 }
             }
+        }
+
+        private static void MapClientConfig(RelewiseClientOptionsBuilder options, ClientJsonConfiguration? config)
+        {
+            options.DatasetId = config?.DatasetId;
+            options.ApiKey = config?.ApiKey;
+            options.Timeout = config?.Timeout;
+        }
+
+        private static void MapClientConfig(RelewiseClientOptionsBuilder options, RelewiseClientOptionsBuilder config)
+        {
+            options.DatasetId = config.DatasetId;
+            options.ApiKey = config.ApiKey;
+            options.Timeout = config.Timeout;
         }
     }
 
@@ -181,6 +189,24 @@ public class RelewiseClientsOptionsBuilder : RelewiseClientOptionsBuilder
     /// If no options have been provided, the client will inherit options from the root configuration.
     /// </summary>
     public RelewiseClientOptionsBuilder Searcher { get; } = new();
+
+    /// <summary>
+    /// Defines options for the <see cref="Relewise.Client.IDataAccessor"/> client.
+    /// If no options have been provided, the client will inherit options from the root configuration.
+    /// </summary>
+    public RelewiseClientOptionsBuilder DataAccessor { get; } = new();
+
+    /// <summary>
+    /// Defines options for the <see cref="Relewise.Client.Search.ISearchAdministrator"/> client.
+    /// If no options have been provided, the client will inherit options from the root configuration.
+    /// </summary>
+    public RelewiseClientOptionsBuilder SearchAdministrator { get; } = new();
+
+    /// <summary>
+    /// Defines options for the <see cref="Relewise.Client.IAnalyzer"/> client.
+    /// If no options have been provided, the client will inherit options from the root configuration.
+    /// </summary>
+    public RelewiseClientOptionsBuilder Analyzer { get; } = new();
 }
 
 /// <summary>
