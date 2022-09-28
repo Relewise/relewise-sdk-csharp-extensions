@@ -52,6 +52,21 @@ public static class ServiceCollectionExtensions
             options => options.Searcher,
             (datasetId, apiKey, timeout) => new Searcher(datasetId, apiKey, timeout));
 
+        TryAdd<IDataAccessor, DataAccessor>(
+            services,
+            options => options.DataAccessor,
+            (datasetId, apiKey, timeout) => new DataAccessor(datasetId, apiKey, timeout));
+
+        TryAdd<ISearchAdministrator, SearchAdministrator>(
+            services,
+            options => options.SearchAdministrator,
+            (datasetId, apiKey, timeout) => new SearchAdministrator(datasetId, apiKey, timeout));
+
+        TryAdd<IAnalyzer, Analyzer>(
+            services,
+            options => options.Analyzer,
+            (datasetId, apiKey, timeout) => new Analyzer(datasetId, apiKey, timeout));
+
         return services;
     }
 
