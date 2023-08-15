@@ -35,6 +35,57 @@ public class ServiceCollectionExtensionsTester
     }
 
     [Test]
+    public void AddDatasetServerUrl()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        const string serverUrl = "test value";
+
+        serviceCollection.AddRelewise(options =>
+        {
+            options.DatasetId = Guid.NewGuid();
+            options.ApiKey = "r4FqfMqtiZjJmoN";
+            options.ServerUrl = serverUrl;
+        });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+        var tracker = provider.GetService<ITracker>();
+
+        Assert.IsNotNull(tracker);
+        Assert.IsNotNull(provider.GetService<IRecommender>());
+        Assert.IsNotNull(provider.GetService<ISearcher>());
+
+        Assert.AreEqual(serverUrl, tracker.ServerUrl);
+        Assert.AreEqual(TimeSpan.FromSeconds(5), tracker.Timeout);
+    }
+
+    [Test]
+    public void NotAddServerUrl()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        const string baseProductionServerUrl = "https://api.relewise.com";
+
+        serviceCollection.AddRelewise(options =>
+            {
+                options.DatasetId = Guid.NewGuid();
+                options.ApiKey = "r4FqfMqtiZjJmoN";
+            });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+        var tracker = provider.GetService<ITracker>();
+
+        Assert.IsNotNull(tracker);
+        Assert.IsNotNull(provider.GetService<IRecommender>());
+        Assert.IsNotNull(provider.GetService<ISearcher>());
+
+        Assert.AreEqual(baseProductionServerUrl, tracker.ServerUrl);
+        Assert.AreEqual(TimeSpan.FromSeconds(5), tracker.Timeout);
+    }
+
+    [Test]
     public void SetSpecificTimeOuts()
     {
         var serviceCollection = new ServiceCollection();
