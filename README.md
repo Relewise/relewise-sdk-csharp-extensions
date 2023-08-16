@@ -13,6 +13,7 @@ Run this command from the NuGet Package Manager Console to install the NuGet pac
 ### Dependency Injection / Wiring up Relewise clients
 
 We provide a lot of ways to easily add the clients you need. The default way to do that is using the following code:
+
 ```csharp
 services.AddRelewise(options =>
 {
@@ -21,29 +22,35 @@ services.AddRelewise(options =>
     options.Timeout = TimeSpan.FromSeconds(3);
 });
 ```
-This will wire up the client instances of `ITracker`, `IRecommender` and `ISearcher`, and these clients will all be configured for the `DatasetId` and `ApiKey` options specificed above, and with a request timeout of 3 seconds.
 
-We recommend that the `DatasetId` and `ApiKey` are stored in a configuration-file. We provide a default way of reading from the appsettings.json, see `options.ReadFromConfiguration(configuration)` below:
+This will wire up the client instances of `ITracker`, `IRecommender` and `ISearcher`, and these clients will all be configured for the `DatasetId` and `ApiKey` options specificed above, and with a request timeout of 3 seconds.
+Optionally, it is possible to define a `ServerUrl` for the client to target. If no value is provided the client will by default target the main Relewise server.
+
+We recommend that the `DatasetId`, `ApiKey` and `ServerUrl` are stored in a configuration-file. We provide a default way of reading from the appsettings.json, see `options.ReadFromConfiguration(configuration)` below:
+
 ```csharp
 IConfiguration configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json")
     .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", true)
     .Build();
-        
+
 services.AddRelewise(options => options.ReadFromConfiguration(configuration));
 ```
 
-The configuration offers a lot of other great features, such as 
+The configuration offers a lot of other great features, such as
+
 - Set specific options for `DatasetId`, `ApiKey` and `Timeout` for the individual client instances of `ITracker`, `IRecommender` and `ISearcher`.
 - Named clients to allow different configuration for integrations etc or to use for a multi site-setup.
 
 Here is a full example of all the configuration settings we provide via the appsettings or via the fluent API:
+
 ```json
 "Relewise": {
     "DatasetId": "6D9361AA-A23D-4BF2-A818-5ABA792E2102",
     "ApiKey": "r4FqfMqtiZjJmoN",
     "Timeout": "00:00:03",
+    "ServelUrl": "https://stage01-api.relewise.com",
     "Tracker": {
         "Timeout": "00:00:10"
     },
@@ -78,6 +85,7 @@ Here is a full example of all the configuration settings we provide via the apps
 ```
 
 When using named clients, you can use the `IRelewiseClientFactory` to retrieve an instance of `ITracker`, `IRecommender` and `ISearcher`:
+
 ```csharp
 IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
 ITracker tracker = factory.GetClient<ITracker>("Integration");
@@ -86,7 +94,7 @@ ITracker tracker = factory.GetClient<ITracker>("Integration");
 ## Contributing
 
 Pull requests are always welcome.  
-Please fork this repository and make a PR when you are ready with your contribution.  
+Please fork this repository and make a PR when you are ready with your contribution.
 
 Otherwise you are welcome to open an Issue in our [issue tracker](https://github.com/Relewise/relewise-sdk-csharp-extensions/issues).
 
