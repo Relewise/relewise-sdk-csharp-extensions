@@ -83,11 +83,7 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
             var hashCode = DatasetId.GetHashCode();
             hashCode = (hashCode * 397) ^ ApiKey.GetHashCode();
             hashCode = (hashCode * 397) ^ Timeout.GetHashCode();
-
-            if (ServerUrl != null)
-            {
-                hashCode = (hashCode * 397) ^ ServerUrl.GetHashCode();
-            }
+            if (ServerUrl != null) hashCode = (hashCode * 397) ^ ServerUrl.GetHashCode();
 
             return hashCode;
         }
