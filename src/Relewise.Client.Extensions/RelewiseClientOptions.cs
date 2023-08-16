@@ -27,9 +27,7 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
 
         if (serverUrl == null) return;
         if (!serverUrl.IsAbsoluteUri || !serverUrl.IsWellFormedOriginalString())
-        {
             throw new ArgumentException(@"Value must be a valid absolute uri.", nameof(serverUrl));
-        }
 
         ServerUrl = serverUrl;
     }
