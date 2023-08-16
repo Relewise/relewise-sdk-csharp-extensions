@@ -51,7 +51,7 @@ public class RelewiseOptionsBuilder : RelewiseClientsOptionsBuilder
 
         var configuration = new Dictionary<string, JsonConfiguration>
         {
-            { sectionName, new JsonConfiguration { DatasetId = Guid.Empty, ApiKey = "<ApiKey>", Timeout = TimeSpan.FromSeconds(3), ServerUrl = "<ServerUrl>"} }
+            { sectionName, new JsonConfiguration { DatasetId = Guid.Empty, ApiKey = "<ApiKey>", Timeout = TimeSpan.FromSeconds(3), ServerUrl = new Uri("<ServerUrl>")} }
         };
 
         return @$"
@@ -151,7 +151,7 @@ Example (to be used in e.g. appSettings.json):
             options.DatasetId = config?.DatasetId;
             options.ApiKey = config?.ApiKey;
             options.Timeout = config?.Timeout;
-            options.ServerUrl = config?.ServerUrl;
+            if (config?.ServerUrl != null) options.ServerUrl = config.ServerUrl;
         }
 
         private static void MapClientConfig(RelewiseClientOptionsBuilder options, RelewiseClientOptionsBuilder config)
@@ -159,7 +159,7 @@ Example (to be used in e.g. appSettings.json):
             options.DatasetId = config.DatasetId;
             options.ApiKey = config.ApiKey;
             options.Timeout = config.Timeout;
-            options.ServerUrl = config.ServerUrl;
+            if (config.ServerUrl != null) options.ServerUrl = config.ServerUrl;
         }
     }
 
@@ -168,7 +168,7 @@ Example (to be used in e.g. appSettings.json):
         public Guid? DatasetId { get; set; }
         public string? ApiKey { get; set; }
         public TimeSpan? Timeout { get; set; }
-        public string? ServerUrl { get; set; }
+        public Uri? ServerUrl { get; set; }
     }
 }
 
@@ -242,7 +242,7 @@ public class RelewiseClientOptionsBuilder
     /// Provides the url of the server to be used by this client.
     /// Value can be found here: https://my.relewise.com.
     /// </summary>
-    public string? ServerUrl { get; set; }
+    public Uri? ServerUrl { get; set; }
 
     internal virtual RelewiseClientOptions? Build(RelewiseClientOptions? parentOptions = null)
     {
@@ -261,7 +261,7 @@ public class RelewiseClientOptionsBuilder
 
         TimeSpan timeout = Timeout.GetValueOrDefault(parentOptions?.Timeout ?? TimeSpan.FromSeconds(5));
 
-        string? serverUrl = ServerUrl ?? parentOptions?.ServerUrl;
+        Uri? serverUrl = ServerUrl ?? parentOptions?.ServerUrl;
 
         return new RelewiseClientOptions(datasetId, apiKey, timeout, serverUrl);
     }

@@ -39,7 +39,7 @@ public class ServiceCollectionExtensionsTester
     {
         var serviceCollection = new ServiceCollection();
 
-        const string serverUrl = "test value";
+        var serverUrl = new Uri("https://valid-uri.com");
 
         serviceCollection.AddRelewise(options =>
         {

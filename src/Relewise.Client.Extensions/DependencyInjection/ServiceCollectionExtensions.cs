@@ -42,32 +42,32 @@ public static class ServiceCollectionExtensions
         TryAdd<ITracker, Tracker>(
             services,
             options => options.Tracker,
-            (datasetId, apiKey, timeout, serverUrl) => new Tracker(datasetId, apiKey, timeout) { ServerUrl = serverUrl });
+            (datasetId, apiKey, timeout, serverUrl) => new Tracker(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
 
         TryAdd<IRecommender, Recommender>(
             services,
             options => options.Recommender,
-            (datasetId, apiKey, timeout, serverUrl) => new Recommender(datasetId, apiKey, timeout) { ServerUrl = serverUrl });
+            (datasetId, apiKey, timeout, serverUrl) => new Recommender(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
 
         TryAdd<ISearcher, Searcher>(
             services,
             options => options.Searcher,
-            (datasetId, apiKey, timeout, serverUrl) => new Searcher(datasetId, apiKey, timeout) { ServerUrl = serverUrl });
+            (datasetId, apiKey, timeout, serverUrl) => new Searcher(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
 
         TryAdd<IDataAccessor, DataAccessor>(
             services,
             options => options.DataAccessor,
-            (datasetId, apiKey, timeout, serverUrl) => new DataAccessor(datasetId, apiKey, timeout) { ServerUrl = serverUrl });
+            (datasetId, apiKey, timeout, serverUrl) => new DataAccessor(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
 
         TryAdd<ISearchAdministrator, SearchAdministrator>(
             services,
             options => options.SearchAdministrator,
-            (datasetId, apiKey, timeout, serverUrl) => new SearchAdministrator(datasetId, apiKey, timeout) { ServerUrl = serverUrl });
+            (datasetId, apiKey, timeout, serverUrl) => new SearchAdministrator(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
 
         TryAdd<IAnalyzer, Analyzer>(
             services,
             options => options.Analyzer,
-            (datasetId, apiKey, timeout, serverUrl) => new Analyzer(datasetId, apiKey, timeout) { ServerUrl = serverUrl });
+            (datasetId, apiKey, timeout, serverUrl) => new Analyzer(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
 
         return services;
     }
@@ -75,7 +75,7 @@ public static class ServiceCollectionExtensions
     private static void TryAdd<TInterface, TClass>(
         IServiceCollection services,
         Func<RelewiseOptionsBuilder, RelewiseClientOptionsBuilder> clientOptionsProvider,
-        Func<Guid, string, TimeSpan, string?, TClass> create)
+        Func<Guid, string, TimeSpan, Uri?, TClass> create)
         where TInterface : class, IClient
         where TClass : TInterface
     {
