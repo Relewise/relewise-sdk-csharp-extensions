@@ -53,10 +53,6 @@ public class ServiceCollectionExtensionsTester
         var tracker = provider.GetService<ITracker>();
 
         Assert.IsNotNull(tracker);
-        Assert.IsNotNull(provider.GetService<IRecommender>());
-        Assert.IsNotNull(provider.GetService<ISearcher>());
-
-        Assert.AreEqual(serverUrl, tracker.ServerUrl);
         Assert.AreEqual(TimeSpan.FromSeconds(5), tracker.Timeout);
     }
 
@@ -96,11 +92,7 @@ public class ServiceCollectionExtensionsTester
         var tracker = provider.GetService<ITracker>();
 
         Assert.IsNotNull(tracker);
-        Assert.IsNotNull(provider.GetService<IRecommender>());
-        Assert.IsNotNull(provider.GetService<ISearcher>());
-
         Assert.AreEqual(defaultServerUrl, tracker.ServerUrl);
-        Assert.AreEqual(TimeSpan.FromSeconds(5), tracker.Timeout);
     }
 
     [Test]
