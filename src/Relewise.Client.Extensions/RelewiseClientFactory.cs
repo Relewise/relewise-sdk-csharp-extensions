@@ -51,42 +51,72 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 name,
                 namedClientOptions.Build(trackerOptions),
                 namedClientOptions.Tracker,
-                (datasetId, apiKey, timeout) => new Tracker(datasetId, apiKey, timeout));
+                (datasetId, apiKey, timeout, serverUrl) =>
+                {
+                    var tracker = new Tracker(datasetId, apiKey, timeout);
+                    if (serverUrl != null) tracker.ServerUrl = serverUrl.ToString();
+                    return tracker;
+                });
 
             AddNamedClient<IRecommender, Recommender>(
                 name,
                 namedClientOptions.Build(recommenderOptions),
                 namedClientOptions.Recommender,
-                (datasetId, apiKey, timeout) => new Recommender(datasetId, apiKey, timeout));
+                (datasetId, apiKey, timeout, serverUrl) =>
+                {
+                    var recommender = new Recommender(datasetId, apiKey, timeout);
+                    if (serverUrl != null) recommender.ServerUrl = serverUrl.ToString();
+                    return recommender;
+                });
 
             AddNamedClient<ISearcher, Searcher>(
                 name,
                 namedClientOptions.Build(searcherOptions),
                 namedClientOptions.Searcher,
-                (datasetId, apiKey, timeout) => new Searcher(datasetId, apiKey, timeout));
+                (datasetId, apiKey, timeout, serverUrl) =>
+                {
+                    var searcher = new Searcher(datasetId, apiKey, timeout);
+                    if (serverUrl != null) searcher.ServerUrl = serverUrl.ToString();
+                    return searcher;
+                });
 
             AddNamedClient<IDataAccessor, DataAccessor>(
                 name,
                 namedClientOptions.Build(dataAccessorOptions),
                 namedClientOptions.DataAccessor,
-                (datasetId, apiKey, timeout) => new DataAccessor(datasetId, apiKey, timeout));
+                (datasetId, apiKey, timeout, serverUrl) =>
+                {
+                    var dataAccessor = new DataAccessor(datasetId, apiKey, timeout);
+                    if (serverUrl != null) dataAccessor.ServerUrl = serverUrl.ToString();
+                    return dataAccessor;
+                });
 
             AddNamedClient<ISearchAdministrator, SearchAdministrator>(
                 name,
                 namedClientOptions.Build(searchAdministratorOptions),
                 namedClientOptions.SearchAdministrator,
-                (datasetId, apiKey, timeout) => new SearchAdministrator(datasetId, apiKey, timeout));
+                (datasetId, apiKey, timeout, serverUrl) =>
+                {
+                    var searchAdministrator = new SearchAdministrator(datasetId, apiKey, timeout);
+                    if (serverUrl != null) searchAdministrator.ServerUrl = serverUrl.ToString();
+                    return searchAdministrator;
+                });
 
             AddNamedClient<IAnalyzer, Analyzer>(
                 name,
                 namedClientOptions.Build(analyzerOptions),
                 namedClientOptions.Analyzer,
-                (datasetId, apiKey, timeout) => new Analyzer(datasetId, apiKey, timeout));
+                (datasetId, apiKey, timeout, serverUrl) =>
+                {
+                    var analyzer = new Analyzer(datasetId, apiKey, timeout);
+                    if (serverUrl != null) analyzer.ServerUrl = serverUrl.ToString();
+                    return analyzer;
+                });
         }
     }
 
     private RelewiseClientOptions? AddOptions<T>(
-        RelewiseClientOptions? globalOptions, 
+        RelewiseClientOptions? globalOptions,
         RelewiseClientOptionsBuilder clientOptions)
     {
         RelewiseClientOptions? options;
@@ -110,7 +140,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         string name,
         RelewiseClientOptions? globalClientOptions,
         RelewiseClientOptionsBuilder namedClientOptions,
-        Func<Guid, string, TimeSpan, TImplementation> create)
+        Func<Guid, string, TimeSpan, string?, TImplementation> create)
         where TInterface : class, IClient
         where TImplementation : TInterface
     {
@@ -132,7 +162,8 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
             TImplementation client = create(
                 options.DatasetId,
                 options.ApiKey,
-                options.Timeout);
+                options.Timeout,
+                options.ServerUrl);
 
             _clients.Add(GenerateClientLookupKey<TInterface>(name), client);
             _options.Add(GenerateClientLookupKey<TInterface>(name), options);
@@ -156,7 +187,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         if (!_clients.TryGetValue(GenerateClientLookupKey<TClient>(name), out IClient? namedClient))
             throw new ArgumentException($"No clients with name '{name}' was registered during startup.");
 
-        return (TClient) namedClient;
+        return (TClient)namedClient;
     }
 
     public RelewiseClientOptions GetOptions<TClient>(string? name = null) where TClient : class, IClient

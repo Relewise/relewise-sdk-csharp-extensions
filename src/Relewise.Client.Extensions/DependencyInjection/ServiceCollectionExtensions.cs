@@ -1,9 +1,7 @@
-﻿using System;
-using System.Data;
-using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Relewise.Client.Search;
+using System;
 
 namespace Relewise.Client.Extensions.DependencyInjection;
 
@@ -42,32 +40,62 @@ public static class ServiceCollectionExtensions
         TryAdd<ITracker, Tracker>(
             services,
             options => options.Tracker,
-            (datasetId, apiKey, timeout, serverUrl) => new Tracker(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
+            (datasetId, apiKey, timeout, serverUrl) =>
+            {
+                var tracker = new Tracker(datasetId, apiKey, timeout);
+                if (serverUrl != null) tracker.ServerUrl = serverUrl.ToString();
+                return tracker;
+            });
 
         TryAdd<IRecommender, Recommender>(
             services,
             options => options.Recommender,
-            (datasetId, apiKey, timeout, serverUrl) => new Recommender(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
+            (datasetId, apiKey, timeout, serverUrl) =>
+            {
+                var recommender = new Recommender(datasetId, apiKey, timeout);
+                if (serverUrl != null) recommender.ServerUrl = serverUrl.ToString();
+                return recommender;
+            });
 
         TryAdd<ISearcher, Searcher>(
             services,
             options => options.Searcher,
-            (datasetId, apiKey, timeout, serverUrl) => new Searcher(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
+            (datasetId, apiKey, timeout, serverUrl) =>
+            {
+                var searcher = new Searcher(datasetId, apiKey, timeout);
+                if (serverUrl != null) searcher.ServerUrl = serverUrl.ToString();
+                return searcher;
+            });
 
         TryAdd<IDataAccessor, DataAccessor>(
             services,
             options => options.DataAccessor,
-            (datasetId, apiKey, timeout, serverUrl) => new DataAccessor(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
+            (datasetId, apiKey, timeout, serverUrl) =>
+            {
+                var dataAccessor = new DataAccessor(datasetId, apiKey, timeout);
+                if (serverUrl != null) dataAccessor.ServerUrl = serverUrl.ToString();
+                return dataAccessor;
+            });
 
         TryAdd<ISearchAdministrator, SearchAdministrator>(
             services,
             options => options.SearchAdministrator,
-            (datasetId, apiKey, timeout, serverUrl) => new SearchAdministrator(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
+            (datasetId, apiKey, timeout, serverUrl) =>
+            {
+                var searchAdministrator = new SearchAdministrator(datasetId, apiKey, timeout);
+                if (serverUrl != null) searchAdministrator.ServerUrl = serverUrl.ToString();
+                return searchAdministrator;
+            });
 
         TryAdd<IAnalyzer, Analyzer>(
             services,
             options => options.Analyzer,
-            (datasetId, apiKey, timeout, serverUrl) => new Analyzer(datasetId, apiKey, timeout) { ServerUrl = serverUrl?.ToString() });
+            (datasetId, apiKey, timeout, serverUrl) =>
+            {
+                var analyzer = new Analyzer(datasetId, apiKey, timeout);
+                if (serverUrl != null) analyzer.ServerUrl = serverUrl.ToString();
+                return analyzer;
+            });
 
         return services;
     }
@@ -75,7 +103,7 @@ public static class ServiceCollectionExtensions
     private static void TryAdd<TInterface, TClass>(
         IServiceCollection services,
         Func<RelewiseOptionsBuilder, RelewiseClientOptionsBuilder> clientOptionsProvider,
-        Func<Guid, string, TimeSpan, Uri?, TClass> create)
+        Func<Guid, string, TimeSpan, string?, TClass> create)
         where TInterface : class, IClient
         where TClass : TInterface
     {

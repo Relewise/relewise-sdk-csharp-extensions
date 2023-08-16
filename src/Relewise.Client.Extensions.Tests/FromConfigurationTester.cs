@@ -41,7 +41,18 @@ namespace Relewise.Client.Extensions.Tests
             Assert.IsNotNull(provider.GetService<IRecommender>());
             Assert.IsNotNull(provider.GetService<ISearcher>());
 
-            Assert.AreEqual("https://stage01-api.relewise.com", tracker.ServerUrl);
+            Assert.AreEqual("https://stage01-api.relewise.com/", tracker.ServerUrl);
+        }
+
+        [Test]
+        public void ReadFromConfiguration_SpecificSectionWithInvalidOtherServerUrl()
+        {
+            var serviceCollection = new ServiceCollection()
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "InvalidStage"));
+
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+            Assert.Catch<ArgumentException>(() => provider.GetService<ITracker>());
         }
 
         [Test]
@@ -61,6 +72,24 @@ namespace Relewise.Client.Extensions.Tests
             Assert.AreEqual(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8"), tracker.DatasetId);
             Assert.AreEqual("https://api.relewise.com", tracker.ServerUrl);
             Assert.AreEqual(TimeSpan.FromSeconds(10), tracker.Timeout);
+        }
+
+        [Test]
+        public void ReadFromConfiguration_SpecificSectionWithNamedClientsWithOtherServerUrl()
+        {
+            var serviceCollection = new ServiceCollection()
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "Stage"));
+
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
+            var tracker = provider.GetService<ITracker>();
+
+            IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
+            ITracker namedClientTracker = factory.GetClient<ITracker>("ContentSite");
+
+            Assert.IsNotNull(tracker);
+            Assert.IsNotNull(namedClientTracker);
+            Assert.AreEqual("https://stage01-api.relewise.com/", tracker.ServerUrl);
+            Assert.AreEqual("https://stage02-api.relewise.com/", namedClientTracker.ServerUrl);
         }
 
         private static void FromConfigAssertion(IServiceCollection serviceCollection)

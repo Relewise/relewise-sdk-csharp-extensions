@@ -39,7 +39,7 @@ public class ServiceCollectionExtensionsTester
     {
         var serviceCollection = new ServiceCollection();
 
-        var serverUrl = new Uri("https://valid-uri.com");
+        const string serverUrl = "https://valid-uri.com/";
 
         serviceCollection.AddRelewise(options =>
         {
@@ -61,11 +61,29 @@ public class ServiceCollectionExtensionsTester
     }
 
     [Test]
+    public void NotAllowInvalidDatasetServerUrl()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        const string serverUrl = "invalid absolute uri";
+
+        serviceCollection.AddRelewise(options =>
+        {
+            options.DatasetId = Guid.NewGuid();
+            options.ApiKey = "r4FqfMqtiZjJmoN";
+            options.ServerUrl = serverUrl;
+        });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+        Assert.Catch<ArgumentException>(() => provider.GetService<ITracker>());
+    }
+
+    [Test]
     public void NotAddServerUrl()
     {
         var serviceCollection = new ServiceCollection();
 
-        const string baseProductionServerUrl = "https://api.relewise.com";
+        const string defaultServerUrl = "https://api.relewise.com";
 
         serviceCollection.AddRelewise(options =>
             {
@@ -81,7 +99,7 @@ public class ServiceCollectionExtensionsTester
         Assert.IsNotNull(provider.GetService<IRecommender>());
         Assert.IsNotNull(provider.GetService<ISearcher>());
 
-        Assert.AreEqual(baseProductionServerUrl, tracker.ServerUrl);
+        Assert.AreEqual(defaultServerUrl, tracker.ServerUrl);
         Assert.AreEqual(TimeSpan.FromSeconds(5), tracker.Timeout);
     }
 

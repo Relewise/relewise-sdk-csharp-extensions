@@ -74,9 +74,9 @@ public class FactoryExtensionsTester
     [Test]
     public void ClientOverrides_GlobalOptions()
     {
-        RelewiseClientOptions globalOptions = new(Guid.NewGuid(), "GlobalApiKey", TimeSpan.FromSeconds(1), new Uri("https://stage01-api.relewise.com"));
-        RelewiseClientOptions recommenderOptions = new(Guid.NewGuid(), "RecommenderApiKey", TimeSpan.FromSeconds(3), new Uri("https://stage01-api.relewise.com"));
-        RelewiseClientOptions searcherOptions = new(Guid.NewGuid(), "SearcherApiKey", TimeSpan.FromSeconds(4), new Uri("https://stage01-api.relewise.com"));
+        RelewiseClientOptions globalOptions = new(Guid.NewGuid(), "GlobalApiKey", TimeSpan.FromSeconds(1), "https://stage01-api.relewise.com");
+        RelewiseClientOptions recommenderOptions = new(Guid.NewGuid(), "RecommenderApiKey", TimeSpan.FromSeconds(3), "https://stage01-api.relewise.com");
+        RelewiseClientOptions searcherOptions = new(Guid.NewGuid(), "SearcherApiKey", TimeSpan.FromSeconds(4), "https://stage01-api.relewise.com");
 
         IRelewiseClientFactory factory = SetupFactory(options =>
         {
@@ -94,9 +94,9 @@ public class FactoryExtensionsTester
     [Test]
     public void NamedClientOverrides_GlobalOptions()
     {
-        RelewiseClientOptions globalOptions = new(Guid.NewGuid(), "GlobalApiKey", TimeSpan.FromSeconds(1), new Uri("https://stage01-api.relewise.com"));
-        RelewiseClientOptions recommenderOptions = new(Guid.NewGuid(), "RecommenderApiKey", TimeSpan.FromSeconds(3), new Uri("https://stage01-api.relewise.com"));
-        RelewiseClientOptions namedRecommenderOptions = new(recommenderOptions.DatasetId, recommenderOptions.ApiKey, TimeSpan.FromSeconds(10), new Uri("https://stage01-api.relewise.com"));
+        RelewiseClientOptions globalOptions = new(Guid.NewGuid(), "GlobalApiKey", TimeSpan.FromSeconds(1), "https://stage01-api.relewise.com");
+        RelewiseClientOptions recommenderOptions = new(Guid.NewGuid(), "RecommenderApiKey", TimeSpan.FromSeconds(3), "https://stage01-api.relewise.com");
+        RelewiseClientOptions namedRecommenderOptions = new(recommenderOptions.DatasetId, recommenderOptions.ApiKey, TimeSpan.FromSeconds(10), "https://stage01-api.relewise.com");
 
         IRelewiseClientFactory factory = SetupFactory(options =>
         {

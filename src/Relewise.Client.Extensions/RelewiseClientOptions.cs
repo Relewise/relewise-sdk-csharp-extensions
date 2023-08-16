@@ -15,7 +15,7 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
     /// <param name="apiKey">Defines the api key that should be used. Api keys can be found (and created) at https://my.relewise.com/developer-settings.</param>
     /// <param name="timeout">Defines the timeout to be used by the client.</param>
     /// <param name="serverUrl">Defines the url of the server to target.The value can be found at https://my.relewise.com/developer-settings.</param>
-    public RelewiseClientOptions(Guid datasetId, string apiKey, TimeSpan timeout, Uri? serverUrl = null)
+    public RelewiseClientOptions(Guid datasetId, string apiKey, TimeSpan timeout, string? serverUrl = null)
     {
         if (datasetId.Equals(Guid.Empty)) throw new ArgumentException(@"Value cannot be empty.", nameof(datasetId));
         if (string.IsNullOrWhiteSpace(apiKey)) throw new ArgumentException(@"Value cannot be null or empty", nameof(apiKey));
@@ -24,7 +24,18 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
         DatasetId = datasetId;
         ApiKey = apiKey;
         Timeout = timeout;
-        if (serverUrl != null) ServerUrl = serverUrl;
+
+        if (serverUrl != null)
+        {
+            if (Uri.TryCreate(serverUrl, UriKind.Absolute, out var validUri))
+            {
+                ServerUrl = validUri.ToString();
+            }
+            else
+            {
+                throw new ArgumentException(@"Value must be a valid absolute uri.", nameof(serverUrl));
+            }
+        }
     }
 
     /// <summary>
@@ -45,7 +56,7 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
     /// <summary>
     /// Defines the url of the Relewise server to target by the client. The value can be found at https://my.relewise.com/developer-settings.
     /// </summary>
-    public Uri? ServerUrl { get; }
+    public string? ServerUrl { get; }
 
     /// <summary>
     /// Returns a value indicating whether this instance and a specified <see cref="RelewiseClientOptions"/> object represent the same value.
