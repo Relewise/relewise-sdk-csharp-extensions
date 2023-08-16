@@ -15,7 +15,7 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
     /// <param name="apiKey">Defines the api key that should be used. Api keys can be found (and created) at https://my.relewise.com/developer-settings.</param>
     /// <param name="timeout">Defines the timeout to be used by the client.</param>
     /// <param name="serverUrl">Defines the url of the server to target.The value can be found at https://my.relewise.com/developer-settings.</param>
-    public RelewiseClientOptions(Guid datasetId, string apiKey, TimeSpan timeout, string? serverUrl = null)
+    public RelewiseClientOptions(Guid datasetId, string apiKey, TimeSpan timeout, Uri? serverUrl = null)
     {
         if (datasetId.Equals(Guid.Empty)) throw new ArgumentException(@"Value cannot be empty.", nameof(datasetId));
         if (string.IsNullOrWhiteSpace(apiKey)) throw new ArgumentException(@"Value cannot be null or empty", nameof(apiKey));
@@ -26,12 +26,12 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
         Timeout = timeout;
 
         if (serverUrl == null) return;
-        if (!Uri.TryCreate(serverUrl, UriKind.Absolute, out var validUri))
+        if (!serverUrl.IsAbsoluteUri || !serverUrl.IsWellFormedOriginalString())
         {
             throw new ArgumentException(@"Value must be a valid absolute uri.", nameof(serverUrl));
         }
 
-        ServerUrl = validUri.ToString();
+        ServerUrl = serverUrl;
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
     /// <summary>
     /// Defines the url of the Relewise server to target by the client. The value can be found at https://my.relewise.com/developer-settings.
     /// </summary>
-    public string? ServerUrl { get; }
+    public Uri? ServerUrl { get; }
 
     /// <summary>
     /// Returns a value indicating whether this instance and a specified <see cref="RelewiseClientOptions"/> object represent the same value.

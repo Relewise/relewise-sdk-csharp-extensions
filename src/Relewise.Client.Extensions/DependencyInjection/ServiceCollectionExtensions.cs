@@ -103,7 +103,7 @@ public static class ServiceCollectionExtensions
     private static void TryAdd<TInterface, TClass>(
         IServiceCollection services,
         Func<RelewiseOptionsBuilder, RelewiseClientOptionsBuilder> clientOptionsProvider,
-        Func<Guid, string, TimeSpan, string?, TClass> create)
+        Func<Guid, string, TimeSpan, Uri?, TClass> create)
         where TInterface : class, IClient
         where TClass : TInterface
     {

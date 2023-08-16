@@ -39,7 +39,7 @@ public class ServiceCollectionExtensionsTester
     {
         var serviceCollection = new ServiceCollection();
 
-        const string serverUrl = "https://valid-uri.com/";
+        var serverUrl = new Uri("https://valid-absolute-uri.com/");
 
         serviceCollection.AddRelewise(options =>
         {
@@ -61,7 +61,7 @@ public class ServiceCollectionExtensionsTester
     {
         var serviceCollection = new ServiceCollection();
 
-        const string serverUrl = "invalid absolute uri";
+        var serverUrl = new Uri("invalidabsoluteuri", UriKind.RelativeOrAbsolute);
 
         serviceCollection.AddRelewise(options =>
         {

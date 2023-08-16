@@ -140,7 +140,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
         string name,
         RelewiseClientOptions? globalClientOptions,
         RelewiseClientOptionsBuilder namedClientOptions,
-        Func<Guid, string, TimeSpan, string?, TImplementation> create)
+        Func<Guid, string, TimeSpan, Uri?, TImplementation> create)
         where TInterface : class, IClient
         where TImplementation : TInterface
     {
