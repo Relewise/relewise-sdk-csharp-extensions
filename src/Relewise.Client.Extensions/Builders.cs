@@ -159,7 +159,9 @@ Example (to be used in e.g. appSettings.json):
             options.DatasetId = config.DatasetId;
             options.ApiKey = config.ApiKey;
             options.Timeout = config.Timeout;
-            if (config.ServerUrl != null) options.ServerUrl = config.ServerUrl;
+
+            if (config.ServerUrl != null)
+                options.ServerUrl = config.ServerUrl;
         }
     }
 

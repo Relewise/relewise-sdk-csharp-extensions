@@ -54,7 +54,10 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 (datasetId, apiKey, timeout, serverUrl) =>
                 {
                     var tracker = new Tracker(datasetId, apiKey, timeout);
-                    if (serverUrl != null) tracker.ServerUrl = serverUrl.ToString();
+
+                    if (serverUrl != null) 
+                        tracker.ServerUrl = serverUrl.ToString();
+
                     return tracker;
                 });
 
@@ -65,7 +68,10 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 (datasetId, apiKey, timeout, serverUrl) =>
                 {
                     var recommender = new Recommender(datasetId, apiKey, timeout);
-                    if (serverUrl != null) recommender.ServerUrl = serverUrl.ToString();
+
+                    if (serverUrl != null) 
+                        recommender.ServerUrl = serverUrl.ToString();
+                   
                     return recommender;
                 });
 
@@ -76,7 +82,10 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 (datasetId, apiKey, timeout, serverUrl) =>
                 {
                     var searcher = new Searcher(datasetId, apiKey, timeout);
-                    if (serverUrl != null) searcher.ServerUrl = serverUrl.ToString();
+
+                    if (serverUrl != null) 
+                        searcher.ServerUrl = serverUrl.ToString();
+                    
                     return searcher;
                 });
 
@@ -87,7 +96,10 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 (datasetId, apiKey, timeout, serverUrl) =>
                 {
                     var dataAccessor = new DataAccessor(datasetId, apiKey, timeout);
-                    if (serverUrl != null) dataAccessor.ServerUrl = serverUrl.ToString();
+                    
+                    if (serverUrl != null) 
+                        dataAccessor.ServerUrl = serverUrl.ToString();
+                    
                     return dataAccessor;
                 });
 
@@ -98,7 +110,10 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 (datasetId, apiKey, timeout, serverUrl) =>
                 {
                     var searchAdministrator = new SearchAdministrator(datasetId, apiKey, timeout);
-                    if (serverUrl != null) searchAdministrator.ServerUrl = serverUrl.ToString();
+                    
+                    if (serverUrl != null) 
+                        searchAdministrator.ServerUrl = serverUrl.ToString();
+                    
                     return searchAdministrator;
                 });
 
@@ -109,7 +124,10 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 (datasetId, apiKey, timeout, serverUrl) =>
                 {
                     var analyzer = new Analyzer(datasetId, apiKey, timeout);
-                    if (serverUrl != null) analyzer.ServerUrl = serverUrl.ToString();
+                    
+                    if (serverUrl != null)
+                        analyzer.ServerUrl = serverUrl.ToString();
+                    
                     return analyzer;
                 });
         }
