@@ -25,17 +25,13 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
         ApiKey = apiKey;
         Timeout = timeout;
 
-        if (serverUrl != null)
+        if (serverUrl == null) return;
+        if (!Uri.TryCreate(serverUrl, UriKind.Absolute, out var validUri))
         {
-            if (Uri.TryCreate(serverUrl, UriKind.Absolute, out var validUri))
-            {
-                ServerUrl = validUri.ToString();
-            }
-            else
-            {
-                throw new ArgumentException(@"Value must be a valid absolute uri.", nameof(serverUrl));
-            }
+            throw new ArgumentException(@"Value must be a valid absolute uri.", nameof(serverUrl));
         }
+
+        ServerUrl = validUri.ToString();
     }
 
     /// <summary>
