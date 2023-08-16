@@ -53,7 +53,7 @@ public class ServiceCollectionExtensionsTester
         var tracker = provider.GetService<ITracker>();
 
         Assert.IsNotNull(tracker);
-        Assert.AreEqual(TimeSpan.FromSeconds(5), tracker.Timeout);
+        Assert.AreEqual(tracker.ServerUrl, serverUrl.ToString());
     }
 
     [Test]

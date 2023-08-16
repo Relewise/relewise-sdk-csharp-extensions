@@ -114,6 +114,30 @@ public class FactoryExtensionsTester
         Assert.AreEqual(namedRecommenderOptions, factory.GetOptions<IRecommender>("Integration"));
     }
 
+    [Test]
+    public void NamedClientOverrides_DifferentServerUrls()
+    {
+        RelewiseClientOptions globalOptions = new(Guid.NewGuid(), "GlobalApiKey", TimeSpan.FromSeconds(1));
+        RelewiseClientOptions recommenderOptions = new(Guid.NewGuid(), "RecommenderApiKey", TimeSpan.FromSeconds(3));
+        RelewiseClientOptions namedRecommenderOptions = new(recommenderOptions.DatasetId, recommenderOptions.ApiKey, TimeSpan.FromSeconds(10), new Uri("https://stage-01.relewise.api"));
+
+        IRelewiseClientFactory factory = SetupFactory(options =>
+        {
+            options.Initialize(globalOptions);
+            options.Recommender.Initialize(recommenderOptions);
+
+            options.Named.Add("Integration", integration =>
+            {
+                integration.Recommender.Initialize(namedRecommenderOptions);
+            });
+        });
+
+        Assert.AreEqual(globalOptions, factory.GetOptions<ITracker>());
+        Assert.AreEqual(recommenderOptions, factory.GetOptions<IRecommender>());
+        Assert.AreEqual(namedRecommenderOptions, factory.GetOptions<IRecommender>("Integration"));
+        Assert.AreNotEqual(factory.GetOptions<ITracker>().ServerUrl, factory.GetOptions<IRecommender>("Integration").ServerUrl);
+    }
+
     private static IRelewiseClientFactory SetupFactory(Action<RelewiseOptionsBuilder> configure)
     {
         var serviceCollection = new ServiceCollection();

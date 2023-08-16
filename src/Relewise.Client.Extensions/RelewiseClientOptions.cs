@@ -7,7 +7,6 @@ namespace Relewise.Client.Extensions;
 /// </summary>
 public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
 {
-
     /// <summary>
     /// Initializes a new instance of the <see cref="RelewiseClientOptions"/>.
     /// </summary>
@@ -25,8 +24,7 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
         ApiKey = apiKey;
         Timeout = timeout;
 
-        if (serverUrl == null) return;
-        if (!serverUrl.IsAbsoluteUri || !serverUrl.IsWellFormedOriginalString())
+        if (serverUrl != null && IsInvalidUrl(serverUrl))
             throw new ArgumentException(@"Value must be a valid absolute uri.", nameof(serverUrl));
 
         ServerUrl = serverUrl;
@@ -87,5 +85,10 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
 
             return hashCode;
         }
+    }
+
+    private static bool IsInvalidUrl(Uri serverUrl)
+    {
+        return !serverUrl.IsAbsoluteUri || !serverUrl.IsWellFormedOriginalString();
     }
 }
