@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Relewise.Client.Search;
 using System;
+using Relewise.Client.Extensions.Infrastructure.Extensions;
 
 namespace Relewise.Client.Extensions.DependencyInjection;
 
@@ -40,80 +41,32 @@ public static class ServiceCollectionExtensions
         TryAdd<ITracker, Tracker>(
             services,
             options => options.Tracker,
-            (datasetId, apiKey, timeout, serverUrl) =>
-            {
-                var tracker = new Tracker(datasetId, apiKey, timeout);
-
-                if (serverUrl != null)
-                    tracker.ServerUrl = serverUrl.ToString();
-
-                return tracker;
-            });
+            (datasetId, apiKey, timeout, serverUrl) => new Tracker(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<IRecommender, Recommender>(
             services,
             options => options.Recommender,
-            (datasetId, apiKey, timeout, serverUrl) =>
-            {
-                var recommender = new Recommender(datasetId, apiKey, timeout);
-
-                if (serverUrl != null) 
-                    recommender.ServerUrl = serverUrl.ToString();
-
-                return recommender;
-            });
+            (datasetId, apiKey, timeout, serverUrl) => new Recommender(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<ISearcher, Searcher>(
             services,
             options => options.Searcher,
-            (datasetId, apiKey, timeout, serverUrl) =>
-            {
-                var searcher = new Searcher(datasetId, apiKey, timeout);
-                
-                if (serverUrl != null)
-                    searcher.ServerUrl = serverUrl.ToString();
-                
-                return searcher;
-            });
+            (datasetId, apiKey, timeout, serverUrl) => new Searcher(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<IDataAccessor, DataAccessor>(
             services,
             options => options.DataAccessor,
-            (datasetId, apiKey, timeout, serverUrl) =>
-            {
-                var dataAccessor = new DataAccessor(datasetId, apiKey, timeout);
-                
-                if (serverUrl != null) 
-                    dataAccessor.ServerUrl = serverUrl.ToString();
-                
-                return dataAccessor;
-            });
+            (datasetId, apiKey, timeout, serverUrl) => new DataAccessor(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<ISearchAdministrator, SearchAdministrator>(
             services,
             options => options.SearchAdministrator,
-            (datasetId, apiKey, timeout, serverUrl) =>
-            {
-                var searchAdministrator = new SearchAdministrator(datasetId, apiKey, timeout);
-                
-                if (serverUrl != null)
-                    searchAdministrator.ServerUrl = serverUrl.ToString();
-                
-                return searchAdministrator;
-            });
+            (datasetId, apiKey, timeout, serverUrl) => new SearchAdministrator(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<IAnalyzer, Analyzer>(
             services,
             options => options.Analyzer,
-            (datasetId, apiKey, timeout, serverUrl) =>
-            {
-                var analyzer = new Analyzer(datasetId, apiKey, timeout);
-                
-                if (serverUrl != null) 
-                    analyzer.ServerUrl = serverUrl.ToString();
-                
-                return analyzer;
-            });
+            (datasetId, apiKey, timeout, serverUrl) => new Analyzer(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         return services;
     }
