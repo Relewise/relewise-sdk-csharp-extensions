@@ -51,85 +51,37 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 name,
                 namedClientOptions.Build(trackerOptions),
                 namedClientOptions.Tracker,
-                (datasetId, apiKey, timeout, serverUrl) =>
-                {
-                    var tracker = new Tracker(datasetId, apiKey, timeout);
-
-                    if (serverUrl != null) 
-                        tracker.ServerUrl = serverUrl.ToString();
-
-                    return tracker;
-                });
+                (datasetId, apiKey, timeout, serverUrl) => new Tracker(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
             AddNamedClient<IRecommender, Recommender>(
                 name,
                 namedClientOptions.Build(recommenderOptions),
                 namedClientOptions.Recommender,
-                (datasetId, apiKey, timeout, serverUrl) =>
-                {
-                    var recommender = new Recommender(datasetId, apiKey, timeout);
-
-                    if (serverUrl != null) 
-                        recommender.ServerUrl = serverUrl.ToString();
-                   
-                    return recommender;
-                });
+                (datasetId, apiKey, timeout, serverUrl) => new Recommender(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
             AddNamedClient<ISearcher, Searcher>(
                 name,
                 namedClientOptions.Build(searcherOptions),
                 namedClientOptions.Searcher,
-                (datasetId, apiKey, timeout, serverUrl) =>
-                {
-                    var searcher = new Searcher(datasetId, apiKey, timeout);
-
-                    if (serverUrl != null) 
-                        searcher.ServerUrl = serverUrl.ToString();
-                    
-                    return searcher;
-                });
+                (datasetId, apiKey, timeout, serverUrl) => new Searcher(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
             AddNamedClient<IDataAccessor, DataAccessor>(
                 name,
                 namedClientOptions.Build(dataAccessorOptions),
                 namedClientOptions.DataAccessor,
-                (datasetId, apiKey, timeout, serverUrl) =>
-                {
-                    var dataAccessor = new DataAccessor(datasetId, apiKey, timeout);
-                    
-                    if (serverUrl != null) 
-                        dataAccessor.ServerUrl = serverUrl.ToString();
-                    
-                    return dataAccessor;
-                });
+                (datasetId, apiKey, timeout, serverUrl) => new DataAccessor(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
             AddNamedClient<ISearchAdministrator, SearchAdministrator>(
                 name,
                 namedClientOptions.Build(searchAdministratorOptions),
                 namedClientOptions.SearchAdministrator,
-                (datasetId, apiKey, timeout, serverUrl) =>
-                {
-                    var searchAdministrator = new SearchAdministrator(datasetId, apiKey, timeout);
-                    
-                    if (serverUrl != null) 
-                        searchAdministrator.ServerUrl = serverUrl.ToString();
-                    
-                    return searchAdministrator;
-                });
+                (datasetId, apiKey, timeout, serverUrl) => new SearchAdministrator(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
             AddNamedClient<IAnalyzer, Analyzer>(
                 name,
                 namedClientOptions.Build(analyzerOptions),
                 namedClientOptions.Analyzer,
-                (datasetId, apiKey, timeout, serverUrl) =>
-                {
-                    var analyzer = new Analyzer(datasetId, apiKey, timeout);
-                    
-                    if (serverUrl != null)
-                        analyzer.ServerUrl = serverUrl.ToString();
-                    
-                    return analyzer;
-                });
+                (datasetId, apiKey, timeout, serverUrl) => new Analyzer(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
         }
     }
 
