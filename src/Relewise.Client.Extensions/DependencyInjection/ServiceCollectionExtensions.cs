@@ -1,7 +1,8 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Relewise.Client.Search;
+using System;
+using Relewise.Client.Extensions.Infrastructure.Extensions;
 
 namespace Relewise.Client.Extensions.DependencyInjection;
 
@@ -40,40 +41,40 @@ public static class ServiceCollectionExtensions
         TryAdd<ITracker, Tracker>(
             services,
             options => options.Tracker,
-            (datasetId, apiKey, timeout) => new Tracker(datasetId, apiKey, timeout));
+            (datasetId, apiKey, timeout, serverUrl) => new Tracker(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<IRecommender, Recommender>(
             services,
             options => options.Recommender,
-            (datasetId, apiKey, timeout) => new Recommender(datasetId, apiKey, timeout));
+            (datasetId, apiKey, timeout, serverUrl) => new Recommender(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<ISearcher, Searcher>(
             services,
             options => options.Searcher,
-            (datasetId, apiKey, timeout) => new Searcher(datasetId, apiKey, timeout));
+            (datasetId, apiKey, timeout, serverUrl) => new Searcher(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<IDataAccessor, DataAccessor>(
             services,
             options => options.DataAccessor,
-            (datasetId, apiKey, timeout) => new DataAccessor(datasetId, apiKey, timeout));
+            (datasetId, apiKey, timeout, serverUrl) => new DataAccessor(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<ISearchAdministrator, SearchAdministrator>(
             services,
             options => options.SearchAdministrator,
-            (datasetId, apiKey, timeout) => new SearchAdministrator(datasetId, apiKey, timeout));
+            (datasetId, apiKey, timeout, serverUrl) => new SearchAdministrator(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         TryAdd<IAnalyzer, Analyzer>(
             services,
             options => options.Analyzer,
-            (datasetId, apiKey, timeout) => new Analyzer(datasetId, apiKey, timeout));
+            (datasetId, apiKey, timeout, serverUrl) => new Analyzer(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
 
         return services;
     }
 
     private static void TryAdd<TInterface, TClass>(
-        IServiceCollection services, 
-        Func<RelewiseOptionsBuilder, RelewiseClientOptionsBuilder> clientOptionsProvider, 
-        Func<Guid, string, TimeSpan, TClass> create)
+        IServiceCollection services,
+        Func<RelewiseOptionsBuilder, RelewiseClientOptionsBuilder> clientOptionsProvider,
+        Func<Guid, string, TimeSpan, Uri?, TClass> create)
         where TInterface : class, IClient
         where TClass : TInterface
     {
@@ -94,7 +95,7 @@ public static class ServiceCollectionExtensions
 To configure this client, use the 'services.AddRelewise(options => {{ ... }});'-method in your startup code.");
             }
 
-            return create(clientOptions.DatasetId, clientOptions.ApiKey, clientOptions.Timeout);
+            return create(clientOptions.DatasetId, clientOptions.ApiKey, clientOptions.Timeout, clientOptions.ServerUrl);
         });
     }
 }

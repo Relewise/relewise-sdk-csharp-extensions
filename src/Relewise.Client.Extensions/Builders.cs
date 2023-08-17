@@ -51,7 +51,7 @@ public class RelewiseOptionsBuilder : RelewiseClientsOptionsBuilder
 
         var configuration = new Dictionary<string, JsonConfiguration>
         {
-            { sectionName, new JsonConfiguration { DatasetId = Guid.Empty, ApiKey = "<ApiKey>", Timeout = TimeSpan.FromSeconds(3) } }
+            { sectionName, new JsonConfiguration { DatasetId = Guid.Empty, ApiKey = "<ApiKey>", Timeout = TimeSpan.FromSeconds(3), ServerUrl = new Uri("<ServerUrl>")} }
         };
 
         return @$"
@@ -60,7 +60,7 @@ Example (to be used in e.g. appSettings.json):
 
 {JsonConvert.SerializeObject(configuration, settings)}";
     }
-    
+
     /// <summary>
     /// Represents configuration of named clients, if you're using this functionality.
     /// Named clients allows you to configure access to multiple datasets from the same application, e.g. for multi-site purposes.
@@ -114,6 +114,7 @@ Example (to be used in e.g. appSettings.json):
             options.ApiKey = ApiKey;
             options.DatasetId = DatasetId;
             options.Timeout = Timeout;
+            options.ServerUrl = ServerUrl;
 
             MapClientConfig(options.Tracker, Tracker);
             MapClientConfig(options.Searcher, Searcher);
@@ -131,6 +132,7 @@ Example (to be used in e.g. appSettings.json):
                         named.ApiKey = namedOptions.ApiKey;
                         named.DatasetId = namedOptions.DatasetId;
                         named.Timeout = namedOptions.Timeout;
+                        named.ServerUrl = namedOptions.ServerUrl;
 
                         MapClientConfig(named.Tracker, namedOptions.Tracker);
                         MapClientConfig(named.Searcher, namedOptions.Searcher);
@@ -149,6 +151,7 @@ Example (to be used in e.g. appSettings.json):
             options.DatasetId = config?.DatasetId;
             options.ApiKey = config?.ApiKey;
             options.Timeout = config?.Timeout;
+            if (config?.ServerUrl != null) options.ServerUrl = config.ServerUrl;
         }
 
         private static void MapClientConfig(RelewiseClientOptionsBuilder options, RelewiseClientOptionsBuilder config)
@@ -156,6 +159,9 @@ Example (to be used in e.g. appSettings.json):
             options.DatasetId = config.DatasetId;
             options.ApiKey = config.ApiKey;
             options.Timeout = config.Timeout;
+
+            if (config.ServerUrl != null)
+                options.ServerUrl = config.ServerUrl;
         }
     }
 
@@ -164,6 +170,7 @@ Example (to be used in e.g. appSettings.json):
         public Guid? DatasetId { get; set; }
         public string? ApiKey { get; set; }
         public TimeSpan? Timeout { get; set; }
+        public Uri? ServerUrl { get; set; }
     }
 }
 
@@ -232,7 +239,13 @@ public class RelewiseClientOptionsBuilder
     /// Default is 5 seconds.
     /// </summary>
     public TimeSpan? Timeout { get; set; }
-    
+
+    /// <summary>
+    /// Provides the url of the server to be used by this client.
+    /// Value can be found here: https://my.relewise.com.
+    /// </summary>
+    public Uri? ServerUrl { get; set; }
+
     internal virtual RelewiseClientOptions? Build(RelewiseClientOptions? parentOptions = null)
     {
         if (DatasetId == null && parentOptions == null)
@@ -250,13 +263,16 @@ public class RelewiseClientOptionsBuilder
 
         TimeSpan timeout = Timeout.GetValueOrDefault(parentOptions?.Timeout ?? TimeSpan.FromSeconds(5));
 
-        return new RelewiseClientOptions(datasetId, apiKey, timeout);
+        var serverUrl = ServerUrl ?? parentOptions?.ServerUrl;
+
+        return new RelewiseClientOptions(datasetId, apiKey, timeout, serverUrl);
     }
-    
+
     internal void Initialize(RelewiseClientOptions options)
     {
         DatasetId = options.DatasetId;
         ApiKey = options.ApiKey;
         Timeout = options.Timeout;
+        ServerUrl = options.ServerUrl;
     }
 }
