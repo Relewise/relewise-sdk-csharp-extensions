@@ -50,7 +50,7 @@ Here is a full example of all the configuration settings we provide via the apps
     "DatasetId": "6D9361AA-A23D-4BF2-A818-5ABA792E2102",
     "ApiKey": "r4FqfMqtiZjJmoN",
     "Timeout": "00:00:03",
-    "ServelUrl": "https://stage01-api.relewise.com",
+    "ServerUrl": "https://stage01-api.relewise.com",
     "Tracker": {
         "Timeout": "00:00:10"
     },
