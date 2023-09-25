@@ -31,7 +31,7 @@ public class RelewiseOptionsBuilder : RelewiseClientsOptionsBuilder
         if (relewiseSection == null)
             throw new ArgumentException($"The specified section '{sectionName}' was not found.{ProvideExample(sectionName)}", nameof(sectionName));
 
-        var readOptions = relewiseSection.Get<JsonConfiguration>();
+        var readOptions = relewiseSection.Get<JsonConfiguration>(); 
 
         if (readOptions == null)
             throw new InvalidOperationException($"Could not read Relewise configuration from configuration. Expected section: '{sectionName}'.{ProvideExample(sectionName)}");
@@ -100,12 +100,12 @@ Example (to be used in e.g. appSettings.json):
 
     private class JsonConfiguration : ClientJsonConfiguration
     {
-        public ClientJsonConfiguration? Tracker { get; }
-        public ClientJsonConfiguration? Recommender { get; }
-        public ClientJsonConfiguration? Searcher { get; }
-        public ClientJsonConfiguration? DataAccessor { get; }
-        public ClientJsonConfiguration? SearchAdministrator { get; }
-        public ClientJsonConfiguration? Analyzer { get; }
+        public ClientJsonConfiguration Tracker { get; } = new ();
+        public ClientJsonConfiguration Recommender { get; } = new();
+        public ClientJsonConfiguration Searcher { get; } = new();
+        public ClientJsonConfiguration DataAccessor { get; } = new();
+        public ClientJsonConfiguration SearchAdministrator { get; } = new();
+        public ClientJsonConfiguration Analyzer { get; } = new();
 
         public Dictionary<string, RelewiseClientsOptionsBuilder>? Named { get; set; }
 
@@ -257,9 +257,6 @@ public class RelewiseClientOptionsBuilder
             throw new ArgumentOutOfRangeException($"Value for '{nameof(DatasetId)} cannot be an empty Guid. The correct value can be found using https://my.relewise.com.");
 
         string? apiKey = ApiKey ?? parentOptions?.ApiKey;
-
-        if (apiKey is null || string.IsNullOrWhiteSpace(apiKey)) // compiler is not happy about only having the string.IsNullOrWhiteSpace-check
-            throw new ArgumentException($@"Value for '{nameof(ApiKey)} cannot be null or empty. The correct value can be found using https://my.relewise.com.", nameof(ApiKey));
 
         TimeSpan timeout = Timeout.GetValueOrDefault(parentOptions?.Timeout ?? TimeSpan.FromSeconds(5));
 

@@ -139,4 +139,88 @@ public class ServiceCollectionExtensionsTester
         var searcher = provider.GetRequiredService<ISearcher>();
         Assert.AreEqual(timeout, searcher.Timeout);
     }
+
+    [Test]
+    public void OnlySetOnClient()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        var datasetId = Guid.NewGuid();
+
+        serviceCollection.AddRelewise(options =>
+        {
+            options.Tracker.DatasetId = datasetId;
+            options.Tracker.ApiKey = "r4FqfMqtiZjJmoN";
+        });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+        var tracker = provider.GetService<ITracker>();
+
+        Assert.IsNotNull(tracker);
+        Assert.AreEqual(datasetId, tracker.DatasetId);
+    }
+
+    [Test]
+    public void OnlySetOnClientWithoutApiKey()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        var datasetId = Guid.NewGuid();
+
+        serviceCollection.AddRelewise(options =>
+        {
+            options.Tracker.DatasetId = datasetId;
+        });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+        Assert.Throws<ArgumentException>(() => provider.GetService<ITracker>());
+    }
+
+    [Test]
+    public void OnlySetOnWrongClient()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        var datasetId = Guid.NewGuid();
+
+        serviceCollection.AddRelewise(options =>
+        {
+            options.Searcher.DatasetId = datasetId;
+            options.Searcher.ApiKey = "r4FqfMqtiZjJmoN";
+        });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+        Assert.Throws<InvalidOperationException>(() => provider.GetService<ITracker>());
+    }
+
+    [Test]
+    public void ThrowException_WhenNoDatasetId()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        serviceCollection.AddRelewise(options =>
+        {
+            options.Tracker.ApiKey = "r4FqfMqtiZjJmoN";
+        });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+        Assert.Throws<InvalidOperationException>(() => provider.GetService<ITracker>());
+    }
+
+    [Test]
+    public void ThrowException_WhenNoApiKey()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        serviceCollection.AddRelewise(options =>
+        {
+            options.Tracker.DatasetId = Guid.NewGuid();
+        });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+        Assert.Throws<ArgumentException>(() => provider.GetService<ITracker>());
+    }
 }

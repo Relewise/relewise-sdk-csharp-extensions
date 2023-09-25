@@ -88,12 +88,15 @@ public static class ServiceCollectionExtensions
             RelewiseClientOptions? globalOptions = options.Build();
             RelewiseClientOptions? clientOptions = clientOptionsProvider(options).Build(globalOptions);
 
-            if (clientOptions == null)
+            if (clientOptions is null)
             {
                 throw new InvalidOperationException($@"No options were given to create a non-named client for {typeof(TInterface).Name}.
 
 To configure this client, use the 'services.AddRelewise(options => {{ ... }});'-method in your startup code.");
             }
+
+            if (clientOptions.ApiKey is null)
+                throw new ArgumentException($@"Value for '{nameof(clientOptions.ApiKey)} cannot be null or empty. The correct value can be found using https://my.relewise.com.", nameof(clientOptions.ApiKey));
 
             return create(clientOptions.DatasetId, clientOptions.ApiKey, clientOptions.Timeout, clientOptions.ServerUrl);
         });
