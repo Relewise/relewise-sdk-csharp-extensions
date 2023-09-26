@@ -95,6 +95,13 @@ public static class ServiceCollectionExtensions
 To configure this client, use the 'services.AddRelewise(options => {{ ... }});'-method in your startup code.");
             }
 
+            if (clientOptions is RelewiseClientOptions.WithoutApiKey)
+            {
+                throw new InvalidOperationException($@"Non-named client for {typeof(TInterface).Name} is missing an ApiKey - either directly set on client or read from global options.
+
+To configure this client, use the 'services.AddRelewise(options => {{ ... }});'-method in your startup code.");
+            }
+
             return create(clientOptions.DatasetId, clientOptions.ApiKey, clientOptions.Timeout, clientOptions.ServerUrl);
         });
     }

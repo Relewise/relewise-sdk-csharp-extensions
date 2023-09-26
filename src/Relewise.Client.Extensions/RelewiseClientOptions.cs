@@ -91,4 +91,19 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
     {
         return !serverUrl.IsAbsoluteUri || !serverUrl.IsWellFormedOriginalString();
     }
+
+    /// <summary>
+    /// Defines the internal property to read the optional ApiKey, when reading from parent.
+    /// </summary>
+    protected internal virtual string? ApiKeyWhenReadAsParent => ApiKey;
+
+    internal class WithoutApiKey : RelewiseClientOptions
+    {
+        public WithoutApiKey(Guid datasetId, TimeSpan timeout, Uri? serverUrl = null)
+            : base(datasetId, "dummy-api-key", timeout, serverUrl)
+        {
+        }
+
+        protected internal override string? ApiKeyWhenReadAsParent => null;
+    }
 }
