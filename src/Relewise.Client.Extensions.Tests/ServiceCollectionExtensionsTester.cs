@@ -35,6 +35,54 @@ public class ServiceCollectionExtensionsTester
     }
 
     [Test]
+    public void SetDatasetIdGloballyButApiKeyOnlyOnSpecificClient()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        var datasetId = Guid.NewGuid();
+        var searcherApiKey = "r4FqfMqtiZjJmoN";
+
+        serviceCollection.AddRelewise(options =>
+        {
+            options.DatasetId = datasetId;
+            options.Searcher.ApiKey = searcherApiKey;
+        });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+        ISearcher searcher = null;
+        Assert.DoesNotThrow(() => searcher = provider.GetService<ISearcher>());
+        Assert.IsNotNull(searcher);
+
+        IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
+        RelewiseClientOptions options = factory.GetOptions<ISearcher>();
+
+        Assert.AreEqual(searcherApiKey, options.ApiKey);
+    }
+
+    [Test]
+    public void SetDatasetIdGloballyButApiKeyOnlyOnNamedClient()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        var datasetId = Guid.NewGuid();
+        var integrationApiKey = "r4FqfMqtiZjJmoN";
+
+        serviceCollection.AddRelewise(options =>
+        {
+            options.DatasetId = datasetId;
+            options.Named.Add("Integration", integration => integration.ApiKey = integrationApiKey);
+        });
+
+        ServiceProvider provider = serviceCollection.BuildServiceProvider();
+
+        IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
+        RelewiseClientOptions options = factory.GetOptions<ITracker>("Integration");
+
+        Assert.AreEqual(integrationApiKey, options.ApiKey);
+    }
+
+    [Test]
     public void AddDatasetServerUrl()
     {
         var serviceCollection = new ServiceCollection();

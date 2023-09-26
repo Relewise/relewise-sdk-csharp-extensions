@@ -127,6 +127,9 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 ex);
         }
 
+        if (options is RelewiseClientOptions.WithoutApiKey)
+            return; // No ApiKey was added ..
+
         if (options != null)
         {
             TImplementation client = create(
