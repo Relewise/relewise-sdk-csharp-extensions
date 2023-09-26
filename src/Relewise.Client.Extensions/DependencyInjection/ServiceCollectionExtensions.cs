@@ -97,7 +97,7 @@ To configure this client, use the 'services.AddRelewise(options => {{ ... }});'-
 
             if (clientOptions is RelewiseClientOptions.WithoutApiKey)
             {
-                throw new InvalidOperationException($@"Non-named client for {typeof(TInterface).Name} is missing an ApiKey - either directly set or read from parent.
+                throw new InvalidOperationException($@"Non-named client for {typeof(TInterface).Name} is missing an ApiKey - either directly set on client or read from global options.
 
 To configure this client, use the 'services.AddRelewise(options => {{ ... }});'-method in your startup code.");
             }
