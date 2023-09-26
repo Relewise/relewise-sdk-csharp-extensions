@@ -127,7 +127,6 @@ namespace Relewise.Client.Extensions.Tests
             Assert.Throws<InvalidOperationException>(() => provider.GetService<ISearcher>());
         }
 
-
         private static void FromConfigAssertion(IServiceCollection serviceCollection)
         {
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
