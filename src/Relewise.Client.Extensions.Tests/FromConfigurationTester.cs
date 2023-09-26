@@ -115,7 +115,7 @@ namespace Relewise.Client.Extensions.Tests
 
             Assert.AreEqual(Guid.Parse("6D9361AA-A23D-4BF2-A818-5ABA792E2102"), tracker.DatasetId);
             Assert.AreEqual("https://api.relewise.com", tracker.ServerUrl);
-            Assert.AreEqual(TimeSpan.FromSeconds(3), tracker.Timeout);
+            Assert.AreEqual(TimeSpan.FromSeconds(10), tracker.Timeout);
         }
 
         private static IConfiguration BuildConfiguration()
