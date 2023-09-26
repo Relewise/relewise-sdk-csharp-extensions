@@ -104,6 +104,30 @@ namespace Relewise.Client.Extensions.Tests
             Assert.IsNotNull(tracker);
         }
 
+        [Test]
+        public void ReadFromConfiguration_OnlySetOnClient()
+        {
+            var serviceCollection = new ServiceCollection()
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "OnlySetOnTracker"));
+
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
+            var tracker = provider.GetService<ITracker>();
+
+            Assert.IsNotNull(tracker);
+            Assert.AreEqual(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8"), tracker.DatasetId);
+        }
+
+        [Test]
+        public void ReadFromConfiguration_OnlySetOnWrongClient()
+        {
+            var serviceCollection = new ServiceCollection()
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "OnlySetOnTracker"));
+
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
+            Assert.Throws<InvalidOperationException>(() => provider.GetService<ISearcher>());
+        }
+
+
         private static void FromConfigAssertion(IServiceCollection serviceCollection)
         {
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
