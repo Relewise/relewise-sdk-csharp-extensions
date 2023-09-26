@@ -100,8 +100,12 @@ namespace Relewise.Client.Extensions.Tests
 
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
             var tracker = provider.GetService<ITracker>();
+            IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
+            RelewiseClientOptions trackerOptions = factory.GetOptions<ITracker>();
 
             Assert.IsNotNull(tracker);
+            Assert.AreEqual(Guid.Parse("6D9361AA-A23D-4BF2-A818-5ABA792E2102"), trackerOptions.DatasetId);
+            Assert.AreEqual("r4FqfMqtiZjJmoN", trackerOptions.ApiKey);
         }
 
         [Test]
@@ -112,9 +116,12 @@ namespace Relewise.Client.Extensions.Tests
 
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
             var tracker = provider.GetService<ITracker>();
+            IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
+            RelewiseClientOptions trackerOptions = factory.GetOptions<ITracker>();
 
             Assert.IsNotNull(tracker);
-            Assert.AreEqual(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8"), tracker.DatasetId);
+            Assert.AreEqual(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8"), trackerOptions.DatasetId);
+            Assert.AreEqual("61ce444b6e7c4f", trackerOptions.ApiKey);
         }
 
         [Test]
