@@ -92,6 +92,18 @@ namespace Relewise.Client.Extensions.Tests
             Assert.AreEqual("https://stage02-api.relewise.com/", namedClientTracker.ServerUrl);
         }
 
+        [Test]
+        public void ApiKeySetOnClientButNeverGlobally()
+        {
+            var serviceCollection = new ServiceCollection()
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "ApiKeySetOnClientButNeverGlobally"));
+
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
+            var tracker = provider.GetService<ITracker>();
+
+            Assert.IsNotNull(tracker);
+        }
+
         private static void FromConfigAssertion(IServiceCollection serviceCollection)
         {
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
