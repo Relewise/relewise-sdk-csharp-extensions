@@ -100,7 +100,7 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
             throw new InvalidOperationException($"Options for {typeof(T).Name} is missing required information. {ex.Message}", ex);
         }
 
-        if (options != null)
+        if (options != null && options is not RelewiseClientOptions.WithoutApiKey)
             _options.Add(GenerateClientLookupKey<T>(), options);
 
         return options;
@@ -126,6 +126,9 @@ internal class RelewiseClientFactory : IRelewiseClientFactory
                 $"Named client '{name}' for '{typeof(TInterface).Name}' is missing required configuration. {ex.Message}",
                 ex);
         }
+
+        if (options is RelewiseClientOptions.WithoutApiKey)
+            return; // No ApiKey was added ... Skip adding named client.
 
         if (options != null)
         {

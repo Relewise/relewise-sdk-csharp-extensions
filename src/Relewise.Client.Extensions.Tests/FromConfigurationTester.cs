@@ -92,6 +92,48 @@ namespace Relewise.Client.Extensions.Tests
             Assert.AreEqual("https://stage02-api.relewise.com/", namedClientTracker.ServerUrl);
         }
 
+        [Test]
+        public void ApiKeySetOnClientButNeverGlobally()
+        {
+            var serviceCollection = new ServiceCollection()
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "ApiKeySetOnClientButNeverGlobally"));
+
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
+            var tracker = provider.GetService<ITracker>();
+            IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
+            RelewiseClientOptions trackerOptions = factory.GetOptions<ITracker>();
+
+            Assert.IsNotNull(tracker);
+            Assert.AreEqual(Guid.Parse("6D9361AA-A23D-4BF2-A818-5ABA792E2102"), trackerOptions.DatasetId);
+            Assert.AreEqual("r4FqfMqtiZjJmoN", trackerOptions.ApiKey);
+        }
+
+        [Test]
+        public void ReadFromConfiguration_OnlySetOnClient()
+        {
+            var serviceCollection = new ServiceCollection()
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "OnlySetOnTracker"));
+
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
+            var tracker = provider.GetService<ITracker>();
+            IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
+            RelewiseClientOptions trackerOptions = factory.GetOptions<ITracker>();
+
+            Assert.IsNotNull(tracker);
+            Assert.AreEqual(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8"), trackerOptions.DatasetId);
+            Assert.AreEqual("61ce444b6e7c4f", trackerOptions.ApiKey);
+        }
+
+        [Test]
+        public void ReadFromConfiguration_OnlySetOnWrongClient()
+        {
+            var serviceCollection = new ServiceCollection()
+                .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "OnlySetOnTracker"));
+
+            ServiceProvider provider = serviceCollection.BuildServiceProvider();
+            Assert.Throws<InvalidOperationException>(() => provider.GetService<ISearcher>());
+        }
+
         private static void FromConfigAssertion(IServiceCollection serviceCollection)
         {
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
@@ -103,7 +145,7 @@ namespace Relewise.Client.Extensions.Tests
 
             Assert.AreEqual(Guid.Parse("6D9361AA-A23D-4BF2-A818-5ABA792E2102"), tracker.DatasetId);
             Assert.AreEqual("https://api.relewise.com", tracker.ServerUrl);
-            Assert.AreEqual(TimeSpan.FromSeconds(3), tracker.Timeout);
+            Assert.AreEqual(TimeSpan.FromSeconds(10), tracker.Timeout);
         }
 
         private static IConfiguration BuildConfiguration()

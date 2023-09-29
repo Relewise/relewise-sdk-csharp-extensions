@@ -100,12 +100,12 @@ Example (to be used in e.g. appSettings.json):
 
     private class JsonConfiguration : ClientJsonConfiguration
     {
-        public ClientJsonConfiguration? Tracker { get; }
-        public ClientJsonConfiguration? Recommender { get; }
-        public ClientJsonConfiguration? Searcher { get; }
-        public ClientJsonConfiguration? DataAccessor { get; }
-        public ClientJsonConfiguration? SearchAdministrator { get; }
-        public ClientJsonConfiguration? Analyzer { get; }
+        public ClientJsonConfiguration? Tracker { get; set; }
+        public ClientJsonConfiguration? Recommender { get; set; }
+        public ClientJsonConfiguration? Searcher { get; set; }
+        public ClientJsonConfiguration? DataAccessor { get; set; }
+        public ClientJsonConfiguration? SearchAdministrator { get; set; }
+        public ClientJsonConfiguration? Analyzer { get; set; }
 
         public Dictionary<string, RelewiseClientsOptionsBuilder>? Named { get; set; }
 
@@ -254,16 +254,16 @@ public class RelewiseClientOptionsBuilder
         Guid datasetId = DatasetId.GetValueOrDefault(parentOptions?.DatasetId ?? Guid.Empty);
 
         if (datasetId.Equals(Guid.Empty))
-            throw new ArgumentOutOfRangeException($"Value for '{nameof(DatasetId)} cannot be an empty Guid. The correct value can be found using https://my.relewise.com.");
-
-        string? apiKey = ApiKey ?? parentOptions?.ApiKey;
-
-        if (apiKey is null || string.IsNullOrWhiteSpace(apiKey)) // compiler is not happy about only having the string.IsNullOrWhiteSpace-check
-            throw new ArgumentException($@"Value for '{nameof(ApiKey)} cannot be null or empty. The correct value can be found using https://my.relewise.com.", nameof(ApiKey));
+            throw new ArgumentOutOfRangeException($"Value for '{nameof(DatasetId)}' cannot be an empty Guid. The correct value can be found using https://my.relewise.com.");
 
         TimeSpan timeout = Timeout.GetValueOrDefault(parentOptions?.Timeout ?? TimeSpan.FromSeconds(5));
 
-        var serverUrl = ServerUrl ?? parentOptions?.ServerUrl;
+        Uri? serverUrl = ServerUrl ?? parentOptions?.ServerUrl;
+
+        string? apiKey = ApiKey ?? parentOptions?.ApiKeyWhenReadAsParent;
+
+        if (apiKey == null)
+            return new RelewiseClientOptions.WithoutApiKey(datasetId, timeout, serverUrl); // ApiKey has not been configured (which is okay)
 
         return new RelewiseClientOptions(datasetId, apiKey, timeout, serverUrl);
     }
