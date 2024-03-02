@@ -83,7 +83,7 @@ Example (to be used in e.g. appSettings.json):
             if (Clients.ContainsKey(name) && throwIfExists)
                 throw new ArgumentException("A client with that name was already registered", nameof(name));
 
-            if (Clients.TryGetValue(name, out RelewiseClientsOptionsBuilder builder))
+            if (Clients.TryGetValue(name, out RelewiseClientsOptionsBuilder? builder))
             {
                 if (throwIfExists)
                     throw new ArgumentException("A client with that name was already registered", nameof(name));
