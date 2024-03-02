@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<nullable>enable</nullable>
-		<LangVersion>10</LangVersion>
-
+		<TargetFrameworks>netstandard2.0;net6.0;net7.0;net8.0</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>true</WarningsAsErrors>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<AssemblyName>Relewise.Client.Extensions</AssemblyName>
 		<RootNamespace>Relewise.Client.Extensions</RootNamespace>
 		<Title>Relewise Client Extensions</Title>
@@ -13,29 +13,28 @@
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageTags>Relewise;Recommendations;Search;SearchEngine;Personalization;Recommender</PackageTags>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<License>http://opensource.org/licenses/MIT</License>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageProjectUrl>https://github.com/Relewise/relewise-sdk-csharp-extensions</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Relewise/relewise-sdk-csharp-extensions</RepositoryUrl>
 		<PackageId>Relewise.Client.Extensions</PackageId>
-		<PackageVersion>1.4.2</PackageVersion>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<PackageVersion>1.5.0</PackageVersion>
 		<Authors>Relewise</Authors>
 		<Company>Relewise</Company>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-		<PackageReference Include="Relewise.Client" Version="1.25.0" />
+		<PackageReference Include="Relewise.Client" Version="[1.25.0, 2)" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="[7.0.0, 9)" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="[7.0.4, 9)" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[7.0.0, 9)" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="logo.png" Pack="true" PackagePath="" />
-		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="logo.png" Pack="true" PackagePath="\" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 	<ItemGroup>

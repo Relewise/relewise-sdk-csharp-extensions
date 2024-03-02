@@ -40,17 +40,17 @@ services.AddRelewise(options => options.ReadFromConfiguration(configuration));
 
 The configuration offers a lot of other great features, such as
 
-- Set specific options for `DatasetId`, `ApiKey` and `Timeout` for the individual client instances of `ITracker`, `IRecommender` and `ISearcher`.
+- Set specific options for `DatasetId`, `ApiKey`, `ServerUrl` and `Timeout` for the individual client instances of `ITracker`, `IRecommender` and `ISearcher`.
 - Named clients to allow different configuration for integrations etc or to use for a multi site-setup.
 
 Here is a full example of all the configuration settings we provide via the appsettings or via the fluent API:
 
 ```json
 "Relewise": {
-    "DatasetId": "6D9361AA-A23D-4BF2-A818-5ABA792E2102",
-    "ApiKey": "r4FqfMqtiZjJmoN",
+    "DatasetId": "<<dataset-id>>",
+    "ApiKey": "<<api-key>>",
     "Timeout": "00:00:03",
-    "ServerUrl": "https://stage01-api.relewise.com",
+    "ServerUrl": "<<server-url>>",
     "Tracker": {
         "Timeout": "00:00:10"
     },
@@ -67,8 +67,9 @@ Here is a full example of all the configuration settings we provide via the apps
             }
         },
         "ContentSite": {
-            "DatasetId": "8DF23DAF-6C96-47DB-BE34-84629359D3B8",
-            "ApiKey": "61ce444b6e7c4f",
+            "DatasetId": "<<dataset-id>>",
+            "ApiKey": "<<api-key>>",
+            "ServerUrl": "<<server-url>>",
             "Timeout": "00:00:03",
             "Tracker": {
                 "Timeout": "00:00:10"
