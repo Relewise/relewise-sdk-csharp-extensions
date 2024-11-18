@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         dotnet-framework: ["netstandard2.0", "net6.0", "net7.0", "net8.0", "net9.0"]
     steps:
@@ -16,9 +16,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "9.0.x"
-          
-      - name: List installed SDKs
-        run: dotnet --list-sdks
 
       - name: Build with dotnet
         run: dotnet build src/Relewise.Client.Extensions/ --configuration Debug --framework ${{ matrix.dotnet-framework }}
