@@ -19,7 +19,7 @@
 		<PackageProjectUrl>https://github.com/Relewise/relewise-sdk-csharp-extensions</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Relewise/relewise-sdk-csharp-extensions</RepositoryUrl>
 		<PackageId>Relewise.Client.Extensions</PackageId>
-		<PackageVersion>1.6.0</PackageVersion>
+		<PackageVersion>1.6.1</PackageVersion>
 		<Authors>Relewise</Authors>
 		<Company>Relewise</Company>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>

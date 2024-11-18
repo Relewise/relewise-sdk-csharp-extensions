@@ -51,7 +51,7 @@ public class RelewiseOptionsBuilder : RelewiseClientsOptionsBuilder
 
         var configuration = new Dictionary<string, JsonConfiguration>
         {
-            { sectionName, new JsonConfiguration { DatasetId = Guid.Empty, ApiKey = "<ApiKey>", Timeout = TimeSpan.FromSeconds(3), ServerUrl = new Uri("<ServerUrl>")} }
+            { sectionName, new JsonConfiguration { DatasetId = Guid.Empty, ApiKey = "<ApiKey>", Timeout = TimeSpan.FromSeconds(3), ServerUrl = new Uri("https://ServerUrl")} }
         };
 
         return @$"
