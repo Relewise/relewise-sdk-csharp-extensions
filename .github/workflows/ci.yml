@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         config:
           - { dotnet-version: "6.0.x", framework: "net6.0" }
@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-dotnet@v4.1.0
         with:
           dotnet-version: ${{ matrix.config.dotnet-version }}
-          include-prerelease: true
           
       - name: List installed SDKs
         run: dotnet --list-sdks
