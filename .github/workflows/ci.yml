@@ -1,6 +1,6 @@
-name: backend
+name: CI
 
-on: pull_request
+on: push
 
 jobs:
   build:
@@ -8,17 +8,17 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dotnet-version: ["6.0.x", "7.0.x", "8.0.x", "9.0.x"]
+        dotnet-framework: ["netstandard2.0", "net6.0", "net7.0", "net8.0", "net9.0"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: "9.0.x"
 
       - name: Build with dotnet
-        run: dotnet build src/Relewise.Client.Extensions/ --configuration Debug
+        run: dotnet build src/Relewise.Client.Extensions/ --configuration Debug --framework ${{ matrix.dotnet-framework }}
         
       - name: Unit testing
         run: dotnet test
