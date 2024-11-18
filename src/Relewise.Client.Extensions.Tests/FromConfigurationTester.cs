@@ -37,11 +37,11 @@ namespace Relewise.Client.Extensions.Tests
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
             var tracker = provider.GetService<ITracker>();
-            Assert.IsNotNull(tracker);
-            Assert.IsNotNull(provider.GetService<IRecommender>());
-            Assert.IsNotNull(provider.GetService<ISearcher>());
+            Assert.That(tracker, Is.Not.Null);
+            Assert.That(provider.GetService<IRecommender>(), Is.Not.Null);
+            Assert.That(provider.GetService<ISearcher>(), Is.Not.Null);
 
-            Assert.AreEqual("https://stage01-api.relewise.com/", tracker.ServerUrl);
+            Assert.That(tracker!.ServerUrl, Is.EqualTo("https://stage01-api.relewise.com/"));
         }
 
         [Test]
@@ -68,10 +68,10 @@ namespace Relewise.Client.Extensions.Tests
             IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
             ITracker tracker = factory.GetClient<ITracker>("ContentSite");
 
-            Assert.IsNotNull(tracker);
-            Assert.AreEqual(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8"), tracker.DatasetId);
-            Assert.AreEqual("https://api.relewise.com", tracker.ServerUrl);
-            Assert.AreEqual(TimeSpan.FromSeconds(10), tracker.Timeout);
+            Assert.That(tracker, Is.Not.Null);
+            Assert.That(tracker.DatasetId, Is.EqualTo(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8")));
+            Assert.That(tracker.ServerUrl, Is.EqualTo("https://api.relewise.com"));
+            Assert.That(tracker.Timeout, Is.EqualTo(TimeSpan.FromSeconds(10)));
         }
 
         [Test]
@@ -81,15 +81,15 @@ namespace Relewise.Client.Extensions.Tests
                 .AddRelewise(options => options.ReadFromConfiguration(BuildConfiguration(), "Stage"));
 
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
-            var tracker = provider.GetService<ITracker>();
+            ITracker? tracker = provider.GetService<ITracker>();
 
             IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
             ITracker namedClientTracker = factory.GetClient<ITracker>("ContentSite");
 
-            Assert.IsNotNull(tracker);
-            Assert.IsNotNull(namedClientTracker);
-            Assert.AreEqual("https://stage01-api.relewise.com/", tracker.ServerUrl);
-            Assert.AreEqual("https://stage02-api.relewise.com/", namedClientTracker.ServerUrl);
+            Assert.That(tracker, Is.Not.Null);
+            Assert.That(namedClientTracker, Is.Not.Null);
+            Assert.That(tracker!.ServerUrl, Is.EqualTo("https://stage01-api.relewise.com/"));
+            Assert.That(namedClientTracker.ServerUrl, Is.EqualTo("https://stage02-api.relewise.com/"));
         }
 
         [Test]
@@ -103,9 +103,9 @@ namespace Relewise.Client.Extensions.Tests
             IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
             RelewiseClientOptions trackerOptions = factory.GetOptions<ITracker>();
 
-            Assert.IsNotNull(tracker);
-            Assert.AreEqual(Guid.Parse("6D9361AA-A23D-4BF2-A818-5ABA792E2102"), trackerOptions.DatasetId);
-            Assert.AreEqual("r4FqfMqtiZjJmoN", trackerOptions.ApiKey);
+            Assert.That(tracker, Is.Not.Null);
+            Assert.That(trackerOptions.DatasetId, Is.EqualTo(Guid.Parse("6D9361AA-A23D-4BF2-A818-5ABA792E2102")));
+            Assert.That(trackerOptions.ApiKey, Is.EqualTo("r4FqfMqtiZjJmoN"));
         }
 
         [Test]
@@ -119,9 +119,9 @@ namespace Relewise.Client.Extensions.Tests
             IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
             RelewiseClientOptions trackerOptions = factory.GetOptions<ITracker>();
 
-            Assert.IsNotNull(tracker);
-            Assert.AreEqual(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8"), trackerOptions.DatasetId);
-            Assert.AreEqual("61ce444b6e7c4f", trackerOptions.ApiKey);
+            Assert.That(tracker, Is.Not.Null);
+            Assert.That(trackerOptions.DatasetId, Is.EqualTo(Guid.Parse("B57CB490-1556-4F06-AA26-96451533A9B8")));
+            Assert.That(trackerOptions.ApiKey, Is.EqualTo("61ce444b6e7c4f"));
         }
 
         [Test]
@@ -139,13 +139,13 @@ namespace Relewise.Client.Extensions.Tests
             ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
             var tracker = provider.GetService<ITracker>();
-            Assert.IsNotNull(tracker);
-            Assert.IsNotNull(provider.GetService<IRecommender>());
-            Assert.IsNotNull(provider.GetService<ISearcher>());
+            Assert.That(tracker, Is.Not.Null);
+            Assert.That(provider.GetService<IRecommender>(), Is.Not.Null);
+            Assert.That(provider.GetService<ISearcher>(), Is.Not.Null);
 
-            Assert.AreEqual(Guid.Parse("6D9361AA-A23D-4BF2-A818-5ABA792E2102"), tracker.DatasetId);
-            Assert.AreEqual("https://api.relewise.com", tracker.ServerUrl);
-            Assert.AreEqual(TimeSpan.FromSeconds(10), tracker.Timeout);
+            Assert.That(tracker!.DatasetId, Is.EqualTo(Guid.Parse("6D9361AA-A23D-4BF2-A818-5ABA792E2102")));
+            Assert.That(tracker.ServerUrl, Is.EqualTo("https://api.relewise.com"));
+            Assert.That(tracker.Timeout, Is.EqualTo(TimeSpan.FromSeconds(10)));
         }
 
         private static IConfiguration BuildConfiguration()
