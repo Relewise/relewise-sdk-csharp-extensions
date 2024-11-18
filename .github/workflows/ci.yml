@@ -21,6 +21,12 @@ jobs:
         with:
           dotnet-version: ${{ matrix.config.dotnet-version }}
 
+      - name: List installed SDKs
+        run: dotnet --list-sdks
+
+      - name: Use .NET CLI Version ${{ matrix.config.dotnet-version }}
+        run: dotnet --version        
+
       - name: Build with dotnet
         run: dotnet build src/Relewise.Client.Extensions/ --configuration Debug --framework ${{ matrix.config.framework }}
         
