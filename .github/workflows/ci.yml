@@ -9,6 +9,7 @@ jobs:
       fail-fast: true
       matrix:
         dotnet-version: ["6.0.x", "7.0.x", "8.0.x", "9.0.x"]
+        framework: ["net6.0", "net7.0", "net8.0", "net9.0"]
     steps:
       - uses: actions/checkout@v4
 
@@ -18,7 +19,7 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Build with dotnet
-        run: dotnet build src/Relewise.Client.Extensions/ --configuration Debug
+        run: dotnet build src/Relewise.Client.Extensions/ --configuration Debug --framework ${{ matrix.framework }}
         
       - name: Unit testing
         run: dotnet test
