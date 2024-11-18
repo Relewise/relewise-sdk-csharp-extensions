@@ -26,12 +26,12 @@ public class ServiceCollectionExtensionsTester
 
         var tracker = provider.GetService<ITracker>();
 
-        Assert.IsNotNull(tracker);
-        Assert.IsNotNull(provider.GetService<IRecommender>());
-        Assert.IsNotNull(provider.GetService<ISearcher>());
+        Assert.That(tracker, Is.Not.Null);
+        Assert.That(provider.GetService<IRecommender>(), Is.Not.Null);
+        Assert.That(provider.GetService<ISearcher>(), Is.Not.Null);
 
-        Assert.AreEqual(datasetId, tracker.DatasetId);
-        Assert.AreEqual(TimeSpan.FromSeconds(5), tracker.Timeout);
+        Assert.That(datasetId, Is.EqualTo(tracker!.DatasetId));
+        Assert.That(tracker.Timeout, Is.EqualTo(TimeSpan.FromSeconds(5)));
     }
 
     [Test]
@@ -50,14 +50,14 @@ public class ServiceCollectionExtensionsTester
 
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
-        ISearcher searcher = null;
+        ISearcher? searcher = null;
         Assert.DoesNotThrow(() => searcher = provider.GetService<ISearcher>());
-        Assert.IsNotNull(searcher);
+        Assert.That(searcher, Is.Not.Null);
 
         IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
         RelewiseClientOptions options = factory.GetOptions<ISearcher>();
 
-        Assert.AreEqual(searcherApiKey, options.ApiKey);
+        Assert.That(searcherApiKey, Is.EqualTo(options.ApiKey));
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class ServiceCollectionExtensionsTester
         IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
         RelewiseClientOptions options = factory.GetOptions<ITracker>("Integration");
 
-        Assert.AreEqual(integrationApiKey, options.ApiKey);
+        Assert.That(integrationApiKey, Is.EqualTo(options.ApiKey));
     }
 
     [Test]
@@ -100,8 +100,8 @@ public class ServiceCollectionExtensionsTester
 
         var tracker = provider.GetService<ITracker>();
 
-        Assert.IsNotNull(tracker);
-        Assert.AreEqual(tracker.ServerUrl, serverUrl.ToString());
+        Assert.That(tracker, Is.Not.Null);
+        Assert.That(tracker!.ServerUrl, Is.EqualTo(serverUrl.ToString()));
     }
 
     [Test]
@@ -139,8 +139,8 @@ public class ServiceCollectionExtensionsTester
 
         var tracker = provider.GetService<ITracker>();
 
-        Assert.IsNotNull(tracker);
-        Assert.AreEqual(defaultServerUrl, tracker.ServerUrl);
+        Assert.That(tracker, Is.Not.Null);
+        Assert.That(defaultServerUrl, Is.EqualTo(tracker!.ServerUrl));
     }
 
     [Test]
@@ -158,10 +158,10 @@ public class ServiceCollectionExtensionsTester
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
         var tracker = provider.GetService<ITracker>();
-        Assert.IsNotNull(tracker);
-        Assert.AreEqual(trackerRequestTimeout, tracker.Timeout);
-        Assert.IsNotNull(provider.GetService<IRecommender>());
-        Assert.IsNotNull(provider.GetService<ISearcher>());
+        Assert.That(tracker, Is.Not.Null);
+        Assert.That(tracker!.Timeout, Is.EqualTo(trackerRequestTimeout));
+        Assert.That(provider.GetService<IRecommender>(), Is.Not.Null);
+        Assert.That(provider.GetService<ISearcher>(), Is.Not.Null);
     }
 
     [Test]
@@ -179,12 +179,12 @@ public class ServiceCollectionExtensionsTester
         ServiceProvider provider = serviceCollection.BuildServiceProvider();
 
         var tracker = provider.GetRequiredService<ITracker>();
-        Assert.AreEqual(timeout, tracker.Timeout);
+        Assert.That(tracker.Timeout, Is.EqualTo(timeout));
 
         var recommender = provider.GetRequiredService<IRecommender>();
-        Assert.AreEqual(timeout, recommender.Timeout);
+        Assert.That(recommender.Timeout, Is.EqualTo(timeout));
 
         var searcher = provider.GetRequiredService<ISearcher>();
-        Assert.AreEqual(timeout, searcher.Timeout);
+        Assert.That(searcher.Timeout, Is.EqualTo(timeout));
     }
 }

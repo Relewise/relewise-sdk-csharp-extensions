@@ -29,8 +29,8 @@ public class FactoryExtensionsTester
         IRelewiseClientFactory factory = provider.GetRequiredService<IRelewiseClientFactory>();
         ITracker tracker = factory.GetClient<ITracker>("Integration");
 
-        Assert.IsNotNull(tracker);
-        Assert.AreEqual(TimeSpan.FromSeconds(20), tracker.Timeout);
+        Assert.That(tracker, Is.Not.Null);
+        Assert.That(tracker.Timeout, Is.EqualTo(TimeSpan.FromSeconds(20)));
     }
 
     [Test]
@@ -85,9 +85,9 @@ public class FactoryExtensionsTester
             options.Searcher.Initialize(searcherOptions);
         });
 
-        Assert.AreEqual(globalOptions, factory.GetOptions<ITracker>());
-        Assert.AreEqual(recommenderOptions, factory.GetOptions<IRecommender>());
-        Assert.AreEqual(searcherOptions, factory.GetOptions<ISearcher>());
+        Assert.That(globalOptions, Is.EqualTo(factory.GetOptions<ITracker>()));
+        Assert.That(recommenderOptions, Is.EqualTo(factory.GetOptions<IRecommender>()));
+        Assert.That(searcherOptions, Is.EqualTo(factory.GetOptions<ISearcher>()));
     }
 
 
@@ -109,9 +109,9 @@ public class FactoryExtensionsTester
             });
         });
 
-        Assert.AreEqual(globalOptions, factory.GetOptions<ITracker>());
-        Assert.AreEqual(recommenderOptions, factory.GetOptions<IRecommender>());
-        Assert.AreEqual(namedRecommenderOptions, factory.GetOptions<IRecommender>("Integration"));
+        Assert.That(globalOptions, Is.EqualTo(factory.GetOptions<ITracker>()));
+        Assert.That(recommenderOptions, Is.EqualTo(factory.GetOptions<IRecommender>()));
+        Assert.That(namedRecommenderOptions, Is.EqualTo(factory.GetOptions<IRecommender>("Integration")));
     }
 
     [Test]
@@ -132,10 +132,10 @@ public class FactoryExtensionsTester
             });
         });
 
-        Assert.AreEqual(globalOptions, factory.GetOptions<ITracker>());
-        Assert.AreEqual(recommenderOptions, factory.GetOptions<IRecommender>());
-        Assert.AreEqual(namedRecommenderOptions, factory.GetOptions<IRecommender>("Integration"));
-        Assert.AreNotEqual(factory.GetOptions<ITracker>().ServerUrl, factory.GetOptions<IRecommender>("Integration").ServerUrl);
+        Assert.That(globalOptions, Is.EqualTo(factory.GetOptions<ITracker>()));
+        Assert.That(recommenderOptions, Is.EqualTo(factory.GetOptions<IRecommender>()));
+        Assert.That(namedRecommenderOptions, Is.EqualTo(factory.GetOptions<IRecommender>("Integration")));
+        Assert.That(factory.GetOptions<ITracker>().ServerUrl, Is.Not.EqualTo(factory.GetOptions<IRecommender>("Integration").ServerUrl));
     }
 
     private static IRelewiseClientFactory SetupFactory(Action<RelewiseOptionsBuilder> configure)
