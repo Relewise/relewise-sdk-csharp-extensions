@@ -19,7 +19,7 @@ jobs:
       - name: Setup .NET Core SDK ${{ matrix.config.dotnet-version }}
         uses: actions/setup-dotnet@v4.1.0
         with:
-          dotnet-version: ${{ matrix.config.dotnet-version }}
+          dotnet-version: "9.0.x"
           
       - name: List installed SDKs
         run: dotnet --list-sdks
