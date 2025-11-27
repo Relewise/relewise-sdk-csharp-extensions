@@ -26,15 +26,15 @@ jobs:
       run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
     - name: Build
-      run: dotnet build --configuration Release /p:Version=${VERSION}
+      run: dotnet build --configuration Release /p:Version=${{ steps.get-latest-tag.outputs.tag }}
 
     - name: Test
-      run: dotnet test --configuration Release /p:Version=${VERSION} --no-build
+      run: dotnet test --configuration Release /p:Version=${{ steps.get-latest-tag.outputs.tag }} --no-build
 
     - name: Pack
-      run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
+      run: dotnet pack --configuration Release /p:Version=${{ steps.get-latest-tag.outputs.tag }} --no-build --output .
 
     - name: Push
-      run: dotnet nuget push Relewise.Client.Extensions.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGET_TOKEN}
+      run: dotnet nuget push Relewise.Client.Extensions.${{ steps.get-latest-tag.outputs.tag }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGET_TOKEN}
       env:
         NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
