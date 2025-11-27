@@ -8,14 +8,14 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dotnet-framework: ["netstandard2.0", "net6.0", "net7.0", "net8.0", "net9.0"]
+        dotnet-framework: ["netstandard2.0", "net6.0", "net7.0", "net8.0", "net9.0", "net10.0"]
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Build with dotnet
         run: dotnet build src/Relewise.Client.Extensions/ --configuration Debug --framework ${{ matrix.dotnet-framework }}
