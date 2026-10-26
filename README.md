@@ -148,6 +148,12 @@ Please fork this repository and make a PR when you are ready with your contribut
 
 Otherwise you are welcome to open an Issue in our [issue tracker](https://github.com/Relewise/relewise-sdk-csharp-extensions/issues).
 
+## Publishing
+
+Publish a GitHub release with a semantic-version tag such as `1.8.0` or `1.8.0-rc.1` (without a `v` prefix). The release tag sets the project and NuGet package version during build and packaging; no version update in the source files is needed. The release commit must be on `main`.
+
+To build and package the same version locally, run `dotnet build --configuration Release /p:Version=1.8.0` followed by `dotnet pack --configuration Release /p:Version=1.8.0 --no-build --output artifacts`.
+
 ## License
 
 Relewise.Client.Extensions is licensed under the [MIT license](./LICENSE)
