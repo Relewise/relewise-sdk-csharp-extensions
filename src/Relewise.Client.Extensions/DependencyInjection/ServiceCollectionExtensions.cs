@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Relewise.Client.Search;
 using System;
-using Relewise.Client.Extensions.Infrastructure.Extensions;
 
 namespace Relewise.Client.Extensions.DependencyInjection;
 
@@ -41,32 +40,44 @@ public static class ServiceCollectionExtensions
         TryAdd<ITracker, Tracker>(
             services,
             options => options.Tracker,
-            (datasetId, apiKey, timeout, serverUrl) => new Tracker(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
+            options => options.ClientId is Guid clientId
+                    ? new Tracker(options.DatasetId, clientId, options.ClientSecret!, options.EffectiveServerUrl, options.Timeout)
+                    : new Tracker(options.DatasetId, options.ApiKey!, options.EffectiveServerUrl, options.Timeout));
 
         TryAdd<IRecommender, Recommender>(
             services,
             options => options.Recommender,
-            (datasetId, apiKey, timeout, serverUrl) => new Recommender(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
+            options => options.ClientId is Guid clientId
+                    ? new Recommender(options.DatasetId, clientId, options.ClientSecret!, options.EffectiveServerUrl, options.Timeout)
+                    : new Recommender(options.DatasetId, options.ApiKey!, options.EffectiveServerUrl, options.Timeout));
 
         TryAdd<ISearcher, Searcher>(
             services,
             options => options.Searcher,
-            (datasetId, apiKey, timeout, serverUrl) => new Searcher(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
+            options => options.ClientId is Guid clientId
+                    ? new Searcher(options.DatasetId, clientId, options.ClientSecret!, options.EffectiveServerUrl, options.Timeout)
+                    : new Searcher(options.DatasetId, options.ApiKey!, options.EffectiveServerUrl, options.Timeout));
 
         TryAdd<IDataAccessor, DataAccessor>(
             services,
             options => options.DataAccessor,
-            (datasetId, apiKey, timeout, serverUrl) => new DataAccessor(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
+            options => options.ClientId is Guid clientId
+                    ? new DataAccessor(options.DatasetId, clientId, options.ClientSecret!, options.EffectiveServerUrl, options.Timeout)
+                    : new DataAccessor(options.DatasetId, options.ApiKey!, options.EffectiveServerUrl, options.Timeout));
 
         TryAdd<ISearchAdministrator, SearchAdministrator>(
             services,
             options => options.SearchAdministrator,
-            (datasetId, apiKey, timeout, serverUrl) => new SearchAdministrator(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
+            options => options.ClientId is Guid clientId
+                    ? new SearchAdministrator(options.DatasetId, clientId, options.ClientSecret!, options.EffectiveServerUrl, options.Timeout)
+                    : new SearchAdministrator(options.DatasetId, options.ApiKey!, options.EffectiveServerUrl, options.Timeout));
 
         TryAdd<IAnalyzer, Analyzer>(
             services,
             options => options.Analyzer,
-            (datasetId, apiKey, timeout, serverUrl) => new Analyzer(datasetId, apiKey, timeout).ConfigureClient(serverUrl));
+            options => options.ClientId is Guid clientId
+                    ? new Analyzer(options.DatasetId, clientId, options.ClientSecret!, options.EffectiveServerUrl, options.Timeout)
+                    : new Analyzer(options.DatasetId, options.ApiKey!, options.EffectiveServerUrl, options.Timeout));
 
         return services;
     }
@@ -74,7 +85,7 @@ public static class ServiceCollectionExtensions
     private static void TryAdd<TInterface, TClass>(
         IServiceCollection services,
         Func<RelewiseOptionsBuilder, RelewiseClientOptionsBuilder> clientOptionsProvider,
-        Func<Guid, string, TimeSpan, Uri?, TClass> create)
+        Func<RelewiseClientOptions, TClass> create)
         where TInterface : class, IClient
         where TClass : TInterface
     {
@@ -97,12 +108,12 @@ To configure this client, use the 'services.AddRelewise(options => {{ ... }});'-
 
             if (clientOptions is RelewiseClientOptions.WithoutApiKey)
             {
-                throw new InvalidOperationException($@"Non-named client for {typeof(TInterface).Name} is missing an ApiKey - either directly set on client or read from global options.
+                throw new InvalidOperationException($@"Non-named client for {typeof(TInterface).Name} is missing authentication - configure ApiKey or OAuth ClientId and ClientSecret, either directly on the client or in global options.
 
 To configure this client, use the 'services.AddRelewise(options => {{ ... }});'-method in your startup code.");
             }
 
-            return create(clientOptions.DatasetId, clientOptions.ApiKey, clientOptions.Timeout, clientOptions.ServerUrl);
+            return create(clientOptions);
         });
     }
 }
