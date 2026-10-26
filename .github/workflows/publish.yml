@@ -6,6 +6,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     timeout-minutes: 15
     steps:
     - name: Checkout
@@ -34,7 +37,13 @@ jobs:
     - name: Pack
       run: dotnet pack --configuration Release /p:Version=${{ steps.get-latest-tag.outputs.tag }} --no-build --output .
 
+    - name: Log in to NuGet.org
+      uses: NuGet/login@v1
+      id: nuget-login
+      with:
+        user: bhk.relewise
+
     - name: Push
       run: dotnet nuget push Relewise.Client.Extensions.${{ steps.get-latest-tag.outputs.tag }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGET_TOKEN}
       env:
-        NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+        NUGET_TOKEN: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
