@@ -10,6 +10,8 @@ jobs:
       contents: read
       id-token: write
     timeout-minutes: 15
+    env:
+      VERSION: ${{ github.event.release.tag_name }}
     steps:
     - name: Checkout
       uses: actions/checkout@v7
@@ -24,18 +26,14 @@ jobs:
         git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
         git branch --remote --contains | grep origin/main
 
-    - name: Get latest tag
-      id: get-latest-tag
-      run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-
     - name: Build
-      run: dotnet build --configuration Release /p:Version=${{ steps.get-latest-tag.outputs.tag }}
+      run: dotnet build --configuration Release /p:Version="${VERSION}"
 
     - name: Test
-      run: dotnet test --configuration Release /p:Version=${{ steps.get-latest-tag.outputs.tag }} --no-build
+      run: dotnet test --configuration Release /p:Version="${VERSION}" --no-build
 
     - name: Pack
-      run: dotnet pack --configuration Release /p:Version=${{ steps.get-latest-tag.outputs.tag }} --no-build --output .
+      run: dotnet pack --configuration Release /p:Version="${VERSION}" --no-build --output .
 
     - name: Log in to NuGet.org
       uses: NuGet/login@v1
@@ -44,6 +42,6 @@ jobs:
         user: bhk.relewise
 
     - name: Push
-      run: dotnet nuget push Relewise.Client.Extensions.${{ steps.get-latest-tag.outputs.tag }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGET_TOKEN}
+      run: dotnet nuget push "Relewise.Client.Extensions.${VERSION}.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${NUGET_TOKEN}
       env:
         NUGET_TOKEN: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
