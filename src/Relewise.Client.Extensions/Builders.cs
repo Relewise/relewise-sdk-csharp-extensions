@@ -112,6 +112,8 @@ Example (to be used in e.g. appSettings.json):
         internal void Map(RelewiseOptionsBuilder options)
         {
             options.ApiKey = ApiKey;
+            options.ClientId = ClientId;
+            options.ClientSecret = ClientSecret;
             options.DatasetId = DatasetId;
             options.Timeout = Timeout;
             options.ServerUrl = ServerUrl;
@@ -130,6 +132,8 @@ Example (to be used in e.g. appSettings.json):
                     options.Named.Add(name, named =>
                     {
                         named.ApiKey = namedOptions.ApiKey;
+                        named.ClientId = namedOptions.ClientId;
+                        named.ClientSecret = namedOptions.ClientSecret;
                         named.DatasetId = namedOptions.DatasetId;
                         named.Timeout = namedOptions.Timeout;
                         named.ServerUrl = namedOptions.ServerUrl;
@@ -150,6 +154,8 @@ Example (to be used in e.g. appSettings.json):
         {
             options.DatasetId = config?.DatasetId;
             options.ApiKey = config?.ApiKey;
+            options.ClientId = config?.ClientId;
+            options.ClientSecret = config?.ClientSecret;
             options.Timeout = config?.Timeout;
             if (config?.ServerUrl != null) options.ServerUrl = config.ServerUrl;
         }
@@ -158,6 +164,8 @@ Example (to be used in e.g. appSettings.json):
         {
             options.DatasetId = config.DatasetId;
             options.ApiKey = config.ApiKey;
+            options.ClientId = config.ClientId;
+            options.ClientSecret = config.ClientSecret;
             options.Timeout = config.Timeout;
 
             if (config.ServerUrl != null)
@@ -169,6 +177,8 @@ Example (to be used in e.g. appSettings.json):
     {
         public Guid? DatasetId { get; set; }
         public string? ApiKey { get; set; }
+        public Guid? ClientId { get; set; }
+        public string? ClientSecret { get; set; }
         public TimeSpan? Timeout { get; set; }
         public Uri? ServerUrl { get; set; }
     }
@@ -234,6 +244,18 @@ public class RelewiseClientOptionsBuilder
     public string? ApiKey { get; set; }
 
     /// <summary>
+    /// Provides the OAuth credential ID from My Relewise, separate from the dataset ID.
+    /// Configure this together with ClientSecret instead of ApiKey.
+    /// </summary>
+    public Guid? ClientId { get; set; }
+
+    /// <summary>
+    /// Provides the OAuth client secret from secure server-side configuration.
+    /// Configure this together with ClientId instead of ApiKey.
+    /// </summary>
+    public string? ClientSecret { get; set; }
+
+    /// <summary>
     /// Timeout to be used when requesting the Relewise API by this client.
     /// Value should be greater than zero.
     /// Default is 5 seconds.
@@ -260,6 +282,20 @@ public class RelewiseClientOptionsBuilder
 
         Uri? serverUrl = ServerUrl ?? parentOptions?.ServerUrl;
 
+        if (ApiKey != null && (ClientId != null || ClientSecret != null))
+            throw new ArgumentException("Configure either ApiKey or OAuth ClientId and ClientSecret, not both.");
+
+        if (ApiKey == null && (ClientId != null || ClientSecret != null || parentOptions?.ClientId != null))
+        {
+            Guid? clientId = ClientId ?? parentOptions?.ClientId;
+            string? clientSecret = ClientSecret ?? parentOptions?.ClientSecret;
+
+            if (clientId == null || clientSecret == null)
+                throw new ArgumentException("OAuth authentication requires both ClientId and ClientSecret.");
+
+            return new RelewiseClientOptions(datasetId, clientId.Value, clientSecret, timeout, serverUrl);
+        }
+
         string? apiKey = ApiKey ?? parentOptions?.ApiKeyWhenReadAsParent;
 
         if (apiKey == null)
@@ -272,6 +308,8 @@ public class RelewiseClientOptionsBuilder
     {
         DatasetId = options.DatasetId;
         ApiKey = options.ApiKey;
+        ClientId = options.ClientId;
+        ClientSecret = options.ClientSecret;
         Timeout = options.Timeout;
         ServerUrl = options.ServerUrl;
     }

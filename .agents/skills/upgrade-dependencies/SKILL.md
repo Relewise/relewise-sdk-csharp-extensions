@@ -12,11 +12,13 @@ Maintain `Relewise.Client.Extensions.sln` as a multi-targeted NuGet library. Rea
 Inspect the project files at execution time; these are the current roles and baselines:
 
 - `src/Relewise.Client.Extensions/Relewise.Client.Extensions.csproj` is the published library. It targets `netstandard2.0`, `net6.0`, `net7.0`, `net8.0`, `net9.0`, and `net10.0`.
-- Its `Relewise.Client` dependency is `[1.25.0, 2)`. Microsoft dependencies are `Microsoft.Extensions.Configuration` `[7.0.0, 11)`, `Microsoft.Extensions.Configuration.Binder` `[7.0.4, 11)`, and `Microsoft.Extensions.DependencyInjection.Abstractions` `[7.0.0, 11)`.
+- Its `Relewise.Client` dependency is `[1.320.0, 2)`. Version 1.320.0 is required for the OAuth client-credentials constructors used by the factories; do not lower this minimum. Microsoft dependencies are `Microsoft.Extensions.Configuration` `[7.0.0, 11)`, `Microsoft.Extensions.Configuration.Binder` `[7.0.4, 11)`, and `Microsoft.Extensions.DependencyInjection.Abstractions` `[7.0.0, 11)`.
 - `src/Relewise.Client.Extensions.Tests/Relewise.Client.Extensions.Tests.csproj` is not packable, targets `net10.0`, and uses specific package versions. Its Microsoft.Extensions references exercise a newer dependency set than the library's minimums; NUnit, NUnit3TestAdapter, and Microsoft.NET.Test.Sdk provide the test toolchain.
 - `.github/workflows/ci.yml` builds the library for every target framework in Debug and runs tests. `.github/workflows/publish.yml` builds, tests, and packs in Release using .NET 10. `.github/dependabot.yml` currently covers GitHub Actions only; it does not maintain NuGet references.
 
 Preserve both ends of the published dependency ranges during routine maintenance. A lower bound is a consumer requirement, not a version to raise whenever an outdated report finds a newer package. The Microsoft ranges intentionally span multiple majors; do not normalize them into next-major ranges or pinned references.
+
+MessagePack is a direct dependency with range `[2.5.307, 3)` to override the SDK's older transitive minimum with a patched v2 release. Keep the v2 major during routine maintenance; do not upgrade to v3 solely to clear the outdated report. Verify current security advisories before raising its minimum, and exercise SDK binary request/response compatibility when changing serializer versions.
 
 Raise a lower bound only for a demonstrated API, compatibility, security, or explicitly requested support-policy requirement, and document the reason. Widen an upper bound only as an explicit compatibility change supported by validation. Report newer versions outside the allowed range as deferred. Do not import dependency exclusions from other repositories.
 
@@ -43,7 +45,7 @@ Do not change target frameworks, workflow SDK versions, the library's `PackageVe
 - Upgrade eligible test dependencies and retain their existing XML formatting and specific-version convention.
 - Preserve library ranges unless the compatibility decision above justifies a change. Avoid `dotnet add package --version` on ranged references when it would replace them with a specific version.
 - Restore and inspect downgrade warnings, incompatible assets, and conflicts between the test project's specific versions and the library ranges.
-- Fix API, configuration binding, dependency injection, or test-runner fallout directly caused by the upgrades. Preserve public API behavior, named-client resolution, option precedence, timeouts, and server URL handling. Add regression coverage when an actual behavior change needs it.
+- Fix API, configuration binding, dependency injection, or test-runner fallout directly caused by the upgrades. Preserve API-key and OAuth client-credentials authentication, named-client resolution, option precedence, timeouts, and server URL handling. Add regression coverage when an actual behavior change needs it.
 - Request direction if resolution requires broad redesign or dropping supported consumers. Do not suppress diagnostics to make validation pass. The projects currently exempt NU1901–NU1904 from warnings-as-errors; those advisories still need reporting.
 
 ## Validation

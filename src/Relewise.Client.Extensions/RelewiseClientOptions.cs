@@ -15,13 +15,36 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
     /// <param name="timeout">Defines the timeout to be used by the client.</param>
     /// <param name="serverUrl">Defines the url of the server to target.The value can be found at https://my.relewise.com/developer-settings.</param>
     public RelewiseClientOptions(Guid datasetId, string apiKey, TimeSpan timeout, Uri? serverUrl = null)
+        : this(datasetId, timeout, serverUrl)
+    {
+        if (string.IsNullOrWhiteSpace(apiKey)) throw new ArgumentException(@"Value cannot be null or empty", nameof(apiKey));
+        ApiKey = apiKey;
+    }
+
+    /// <summary>
+    /// Initializes client options using OAuth 2.0 client credentials.
+    /// </summary>
+    /// <param name="datasetId">The dataset ID from My Relewise.</param>
+    /// <param name="clientId">The OAuth credential ID, separate from the dataset ID.</param>
+    /// <param name="clientSecret">The client secret stored in secure server-side configuration.</param>
+    /// <param name="timeout">The timeout for the request, including token acquisition.</param>
+    /// <param name="serverUrl">The dataset server URL. Defaults to the SDK's production server.</param>
+    public RelewiseClientOptions(Guid datasetId, Guid clientId, string clientSecret, TimeSpan timeout, Uri? serverUrl = null)
+        : this(datasetId, timeout, serverUrl)
+    {
+        if (clientId == Guid.Empty) throw new ArgumentException(@"Value cannot be empty.", nameof(clientId));
+        if (string.IsNullOrWhiteSpace(clientSecret)) throw new ArgumentException(@"Value cannot be null or empty.", nameof(clientSecret));
+
+        ClientId = clientId;
+        ClientSecret = clientSecret;
+    }
+
+    private RelewiseClientOptions(Guid datasetId, TimeSpan timeout, Uri? serverUrl)
     {
         if (datasetId.Equals(Guid.Empty)) throw new ArgumentException(@"Value cannot be empty.", nameof(datasetId));
-        if (string.IsNullOrWhiteSpace(apiKey)) throw new ArgumentException(@"Value cannot be null or empty", nameof(apiKey));
         if (timeout <= TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(timeout), timeout, @"Timeout value cannot be negative.");
 
         DatasetId = datasetId;
-        ApiKey = apiKey;
         Timeout = timeout;
 
         if (serverUrl != null && IsInvalidUrl(serverUrl))
@@ -36,9 +59,17 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
     public Guid DatasetId { get; }
 
     /// <summary>
-    /// Defines the api key that should be used. Api keys can be found (and created) at https://my.relewise.com/developer-settings.
+    /// Defines the API key, or null when OAuth client credentials are used.
     /// </summary>
-    public string ApiKey { get; }
+    public string? ApiKey { get; }
+
+    /// <summary>Defines the OAuth credential ID, or null when an API key is used.</summary>
+    public Guid? ClientId { get; }
+
+    /// <summary>Defines the OAuth client secret, or null when an API key is used.</summary>
+    public string? ClientSecret { get; }
+
+    internal string EffectiveServerUrl => ServerUrl?.ToString() ?? "https://api.relewise.com";
 
     /// <summary>
     /// Defines the timeout to be used by the client.
@@ -57,7 +88,8 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return DatasetId.Equals(other.DatasetId) && ApiKey == other.ApiKey && Timeout.Equals(other.Timeout) && ServerUrl == other.ServerUrl;
+        return DatasetId.Equals(other.DatasetId) && ApiKey == other.ApiKey && ClientId == other.ClientId &&
+               ClientSecret == other.ClientSecret && Timeout.Equals(other.Timeout) && ServerUrl == other.ServerUrl;
     }
 
     /// <summary>
@@ -79,7 +111,9 @@ public class RelewiseClientOptions : IEquatable<RelewiseClientOptions>
         unchecked
         {
             var hashCode = DatasetId.GetHashCode();
-            hashCode = (hashCode * 397) ^ ApiKey.GetHashCode();
+            hashCode = (hashCode * 397) ^ (ApiKey?.GetHashCode() ?? 0);
+            hashCode = (hashCode * 397) ^ ClientId.GetHashCode();
+            hashCode = (hashCode * 397) ^ (ClientSecret?.GetHashCode() ?? 0);
             hashCode = (hashCode * 397) ^ Timeout.GetHashCode();
             if (ServerUrl != null) hashCode = (hashCode * 397) ^ ServerUrl.GetHashCode();
 

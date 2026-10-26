@@ -96,7 +96,7 @@ public class FactoryExtensionsTester
     {
         RelewiseClientOptions globalOptions = new(Guid.NewGuid(), "GlobalApiKey", TimeSpan.FromSeconds(1));
         RelewiseClientOptions recommenderOptions = new(Guid.NewGuid(), "RecommenderApiKey", TimeSpan.FromSeconds(3));
-        RelewiseClientOptions namedRecommenderOptions = new(recommenderOptions.DatasetId, recommenderOptions.ApiKey, TimeSpan.FromSeconds(10));
+        RelewiseClientOptions namedRecommenderOptions = new(recommenderOptions.DatasetId, recommenderOptions.ApiKey!, TimeSpan.FromSeconds(10));
 
         IRelewiseClientFactory factory = SetupFactory(options =>
         {
@@ -119,7 +119,7 @@ public class FactoryExtensionsTester
     {
         RelewiseClientOptions globalOptions = new(Guid.NewGuid(), "GlobalApiKey", TimeSpan.FromSeconds(1));
         RelewiseClientOptions recommenderOptions = new(Guid.NewGuid(), "RecommenderApiKey", TimeSpan.FromSeconds(3));
-        RelewiseClientOptions namedRecommenderOptions = new(recommenderOptions.DatasetId, recommenderOptions.ApiKey, TimeSpan.FromSeconds(10), new Uri("https://stage-01.relewise.api"));
+        RelewiseClientOptions namedRecommenderOptions = new(recommenderOptions.DatasetId, recommenderOptions.ApiKey!, TimeSpan.FromSeconds(10), new Uri("https://stage-01.relewise.api"));
 
         IRelewiseClientFactory factory = SetupFactory(options =>
         {

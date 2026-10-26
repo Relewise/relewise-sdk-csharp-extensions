@@ -26,6 +26,55 @@ services.AddRelewise(options =>
 This will wire up the client instances of `ITracker`, `IRecommender` and `ISearcher`, and these clients will all be configured for the `DatasetId` and `ApiKey` options specificed above, and with a request timeout of 3 seconds.
 Optionally, it is possible to define a `ServerUrl` for the client to target. If no value is provided the client will by default target the main Relewise server.
 
+### OAuth 2.0 client credentials
+
+OAuth authentication requires `Relewise.Client` 1.320.0 or later, which is the minimum SDK version required by this library. Configure `ClientId` and `ClientSecret` instead of `ApiKey`:
+
+```csharp
+services.AddRelewise(options =>
+{
+    options.DatasetId = Guid.Parse(configuration["Relewise:DatasetId"]!);
+    options.ClientId = Guid.Parse(configuration["Relewise:ClientId"]!);
+    options.ClientSecret = configuration["Relewise:ClientSecret"];
+    options.ServerUrl = new Uri(configuration["Relewise:ServerUrl"]!);
+});
+```
+
+The Client ID identifies the OAuth credential and is separate from the Dataset ID. Keep the Client Secret in secure server-side configuration, such as environment variables or a secret store. The SDK handles token acquisition, caching, and renewal; the registered singleton clients are reused across requests.
+
+`ReadFromConfiguration` supports the same options. For example, the following shows the configuration shape; replace the placeholders through your configuration provider:
+
+```json
+"Relewise": {
+    "DatasetId": "<Dataset ID>",
+    "ClientId": "<Client ID>",
+    "ClientSecret": "<Client Secret>",
+    "ServerUrl": "<Server URL>"
+}
+```
+
+Both authentication methods work for Tracker, Recommender, Searcher, DataAccessor, SearchAdministrator, and Analyzer, including named clients. Credentials inherit through the existing global, per-client, named, and named per-client options. A child that sets `ApiKey` selects API-key authentication; a child that sets `ClientId` or `ClientSecret` selects OAuth and can inherit missing OAuth fields from its parent. Without inherited OAuth credentials, configure both fields together. Do not set `ApiKey` and OAuth fields at the same configuration level.
+
+For example, an OAuth-based application can use a separate API key for a named integration:
+
+```csharp
+services.AddRelewise(options =>
+{
+    options.ReadFromConfiguration(configuration);
+    options.Named.Add("Integration", integration =>
+    {
+        integration.ApiKey = configuration["Integration:ApiKey"];
+        integration.Tracker.Timeout = TimeSpan.FromSeconds(30);
+    });
+});
+```
+
+`IRelewiseClientFactory.GetOptions<TClient>()` returns `ClientId` and `ClientSecret` for OAuth clients, with `ApiKey` set to null. Avoid logging resolved credentials. Existing API-key registrations and the API-key `RelewiseClientOptions` constructor remain supported.
+
+See the [SDK authentication guide](https://docs.relewise.com/docs/developer/sdks/dotnet.html#authentication) for credential setup and OAuth behavior.
+
+### Reading configuration
+
 We recommend that the `DatasetId`, `ApiKey` and `ServerUrl` are stored in a configuration-file. We provide a default way of reading from the appsettings.json, see `options.ReadFromConfiguration(configuration)` below:
 
 ```csharp
